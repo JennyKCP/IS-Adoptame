@@ -53,7 +53,7 @@ export function ServerSideSort({
   return (
     <>
       <Label htmlFor="sort-order" className="sr-only text-sm font-medium">
-        Sort by:
+        Ordenar por:
       </Label>
       <Select
         name="sort-order"

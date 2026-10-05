@@ -36,7 +36,7 @@ const Search = ({ placeholder, className, iconClassName }: SearchProps) => {
   return (
     <div className="relative">
       <label htmlFor="search" className="sr-only">
-        Search
+        Buscar
       </label>
       <Input
         
