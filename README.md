@@ -28,6 +28,24 @@ Store si quieres subir imágenes desde el dashboard.
 
 ## Instalación local
 
+### Inicio rápido
+
+La aplicación es full-stack: Next.js ejecuta la interfaz y el backend en el
+mismo proceso. No existe un servicio backend separado que debas iniciar.
+
+Desde la raíz del proyecto, ejecuta:
+
+```bash
+npm ci                         # solo la primera vez
+docker compose up -d           # inicia PostgreSQL
+docker compose ps              # verifica el contenedor
+npm run db                     # sincroniza Prisma y carga el seed
+npm run dev                    # inicia frontend y backend
+```
+
+Después abre [http://localhost:3000](http://localhost:3000). Para detener la
+aplicación, presiona `Ctrl + C` en la terminal donde ejecutaste `npm run dev`.
+
 ### 1. Abrir el proyecto
 
 Abre una terminal en la carpeta del proyecto:
@@ -41,6 +59,8 @@ cd /ruta/a/la/carpeta-del-proyecto
 ```bash
 npm ci
 ```
+
+El proyecto requiere Node.js `24.x` y npm `10.9` o superior.
 
 ### 3. Crear la configuración local
 
@@ -152,6 +172,9 @@ npm run dev
 
 Abre [http://localhost:3000](http://localhost:3000).
 
+Este comando inicia Next.js en modo desarrollo, incluyendo las páginas,
+acciones del servidor, rutas API y conexión de Prisma con PostgreSQL.
+
 ## Acceso de administrador
 
 Entra en [http://localhost:3000/sign-in](http://localhost:3000/sign-in) con:
@@ -176,6 +199,29 @@ La cuenta se crea al ejecutar `npm run db`.
 | `npm run e2e` | Ejecuta las pruebas end-to-end. |
 | `docker compose down` | Detiene PostgreSQL y conserva sus datos. |
 | `docker compose down -v` | Detiene PostgreSQL y elimina sus datos. |
+
+### Detener y reiniciar servicios
+
+Para detener solo PostgreSQL y conservar la información local:
+
+```bash
+docker compose down
+```
+
+Para reiniciar PostgreSQL sin eliminar el volumen:
+
+```bash
+docker compose up -d
+```
+
+Para eliminar completamente la base de datos local y sus datos:
+
+```bash
+docker compose down -v
+```
+
+Después de eliminar el volumen, debes ejecutar nuevamente `npm run db` para
+crear el esquema y cargar los datos iniciales.
 
 > `docker compose down -v` es una operación destructiva para la base local:
 > elimina el volumen de PostgreSQL y todos sus datos.
