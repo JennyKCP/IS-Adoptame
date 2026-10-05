@@ -170,7 +170,7 @@ export function ConvertFosterToAdoptionForm({
       <CardFooter className="flex justify-end space-x-4">
         <Button asChild variant="outline" type="button" disabled={isPending}>
           <Link href={`/dashboard/animals/${placement.animal.id}`}>
-            Cancel
+            Cancelar
           </Link>
         </Button>
         <AlertDialog open={open} onOpenChange={setOpen}>
@@ -189,7 +189,7 @@ export function ConvertFosterToAdoptionForm({
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel disabled={isPending}>
-                Cancel
+                Cancelar
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={(e) => {

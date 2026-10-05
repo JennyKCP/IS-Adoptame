@@ -291,7 +291,7 @@ const StaffAdoptionApplicationForm = ({
                   `/dashboard/people-directory/${person.id}/adoption-applications`
                 }
               >
-                Cancel
+                Cancelar
               </Link>
             </Button>
             <Button type="submit" size="lg" disabled={isPending}>

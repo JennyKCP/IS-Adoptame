@@ -314,7 +314,7 @@ export const TaskForm = ({
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="outline" disabled={isPending}>
-              Cancel
+              Cancelar
             </Button>
           </DialogClose>
           <Button type="submit" disabled={isPending}>

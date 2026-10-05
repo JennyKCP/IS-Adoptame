@@ -140,7 +140,7 @@ const AnimalNotes = ({ notes, totalPages, animalId, canManage }: Props) => {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel onClick={cancelDiscard}>
-                      Cancel
+                      Cancelar
                     </AlertDialogCancel>
                     <AlertDialogAction onClick={confirmDiscard}>
                       Discard

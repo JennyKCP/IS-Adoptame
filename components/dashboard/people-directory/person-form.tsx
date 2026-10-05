@@ -143,14 +143,14 @@ const PersonForm = ({
           <CardHeader>
             <CardTitle className="@[650px]/card:text-xl">
               {mode === "self"
-                ? "My Profile"
+                ? "Mi perfil"
                 : isEditMode
-                  ? "Edit Person"
-                  : "New Person"}
+                  ? "Editar persona"
+                  : "Nueva persona"}
             </CardTitle>
             <CardDescription>
               {mode === "self"
-                ? "Update your contact information."
+                ? "Actualiza tu información de contacto."
                 : isEditMode
                   ? `Editing the record for ${person.name}.`
                   : "Register a new contact record — e.g., a walk-in contact or partner."}
@@ -223,7 +223,7 @@ const PersonForm = ({
                   : "Creating..."
                 : isEditMode
                   ? "Save Changes"
-                  : "Create Person"}
+                  : "Crear persona"}
             </Button>
           </CardFooter>
         </Card>

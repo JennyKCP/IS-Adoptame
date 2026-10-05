@@ -345,7 +345,7 @@ export function AssessmentForm({
         <div className="flex justify-end gap-2 pt-2">
           <Button asChild variant="outline" type="button" disabled={isPending}>
             <Link href={`/dashboard/animals/${animalId}/assessments`}>
-              Cancel
+              Cancelar
             </Link>
           </Button>
           <Button type="submit" disabled={isPending}>

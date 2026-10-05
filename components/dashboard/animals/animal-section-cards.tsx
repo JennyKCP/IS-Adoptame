@@ -128,7 +128,7 @@ const AnimalSectionCards = async ({ params }: Props) => {
     if (animal.listingStatus === AnimalListingStatus.ARCHIVED) {
       return {
         href: `/dashboard/animals/${animal.id}/intake/create`,
-        label: "Create Re-Intake",
+      label: "Crear reingreso",
       };
     }
     if (approvedApplications.length === 1) {
@@ -145,7 +145,7 @@ const AnimalSectionCards = async ({ params }: Props) => {
     }
     return {
       href: `/dashboard/outcomes/create?animalId=${animal.id}`,
-      label: "Create Outcome",
+      label: "Crear resultado",
     };
   })();
 
@@ -372,7 +372,7 @@ const AnimalSectionCards = async ({ params }: Props) => {
                     </span>
                   </div>
                   <div className="flex items-center justify-between border-b pb-2 text-sm">
-                    <span className="text-muted-foreground">Health Status</span>
+                    <span className="text-muted-foreground">Estado de salud</span>
                     <span className="font-medium capitalize">
                       {formatSingleEnumOption(animal.healthStatus) === "N/A"
                         ? "Healthy"
@@ -395,7 +395,7 @@ const AnimalSectionCards = async ({ params }: Props) => {
                 </h4>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between border-b pb-2 text-sm">
-                    <span className="text-muted-foreground">Location</span>
+                    <span className="text-muted-foreground">Ubicación</span>
                     {openPlacement ? (
                       <span className="flex items-center gap-1 font-medium text-foreground">
                         <Home className="h-3.5 w-3.5 text-muted-foreground" />

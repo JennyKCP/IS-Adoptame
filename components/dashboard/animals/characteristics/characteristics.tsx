@@ -333,7 +333,7 @@ const AnimalCharacteristicsManager = ({
             onClick={() => guardedOnOpenChange(false)}
             disabled={isPending}
           >
-            Cancel
+            Cancelar
           </Button>
           <Button onClick={handleSave} disabled={isPending}>
             {isPending ? (
@@ -362,7 +362,7 @@ const AnimalCharacteristicsManager = ({
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={cancelDiscard}>
-              Cancel
+              Cancelar
             </AlertDialogCancel>
             <AlertDialogAction onClick={confirmDiscard}>
               Discard

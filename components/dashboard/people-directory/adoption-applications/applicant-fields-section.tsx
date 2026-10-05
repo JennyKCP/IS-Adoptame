@@ -73,7 +73,7 @@ export const ApplicantFieldsSection = ({
             name="applicantName"
             render={({ field }) => (
               <FormItem>
-                <FormLabel required>Full Name</FormLabel>
+                <FormLabel required>Nombre completo</FormLabel>
                 <FormControl>
                   <Input placeholder="John Doe" {...field} />
                 </FormControl>
@@ -171,7 +171,7 @@ export const ApplicantFieldsSection = ({
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select a state" />
+                        <SelectValue placeholder="Selecciona un estado" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -220,7 +220,7 @@ export const ApplicantFieldsSection = ({
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select living situation" />
+                      <SelectValue placeholder="Selecciona la situación de vivienda" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>

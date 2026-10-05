@@ -278,7 +278,7 @@ const AnimalForm = ({
         <Card className="w-full max-w-4xl mx-auto">
           <CardHeader>
             <CardTitle>
-              {isEditMode ? "Edit Animal Details" : "New Animal Intake"}
+              {isEditMode ? "Editar datos del animal" : "Nuevo ingreso de animal"}
             </CardTitle>
             <CardDescription>
               {isEditMode
@@ -428,7 +428,7 @@ const AnimalForm = ({
                               >
                                 {selectedIds.length > 0
                                   ? `${selectedIds.length} selected`
-                                  : "Select colors"}
+                                  : "Seleccionar colores"}
                                 <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                               </Button>
                             </FormControl>
@@ -864,7 +864,7 @@ const AnimalForm = ({
                   : "Submitting..."
                 : isEditMode
                   ? "Save Changes"
-                  : "Create Intake"}
+                  : "Crear ingreso"}
             </Button>
           </CardFooter>
         </Card>

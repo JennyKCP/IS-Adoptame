@@ -134,7 +134,7 @@ export function NoteActions({ note, animalId }: NoteActionsProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={cancelDiscard}>
-              Cancel
+              Cancelar
             </AlertDialogCancel>
             <AlertDialogAction onClick={confirmDiscard}>
               Discard

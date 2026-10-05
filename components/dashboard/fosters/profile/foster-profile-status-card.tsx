@@ -222,7 +222,7 @@ export function FosterProfileStatusCard({
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
             <CardHeader>
-              <CardTitle>Foster Capabilities</CardTitle>
+          <CardTitle>Capacidades para acogida</CardTitle>
               <CardDescription>What this foster can take on.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-10">

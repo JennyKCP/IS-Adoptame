@@ -129,7 +129,7 @@ const StaffAdoptionApplicationEditForm = ({
               disabled={isPending}
             >
               <Link href={returnTo ?? "/dashboard/adoption-applications"}>
-                Cancel
+                Cancelar
               </Link>
             </Button>
             <Button type="submit" size="lg" disabled={isPending}>

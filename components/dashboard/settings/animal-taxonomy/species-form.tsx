@@ -77,7 +77,7 @@ export const SpeciesForm = ({ onFormSubmit, species }: Props) => {
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="outline" disabled={isPending}>
-              Cancel
+              Cancelar
             </Button>
           </DialogClose>
           <Button type="submit" disabled={isPending}>

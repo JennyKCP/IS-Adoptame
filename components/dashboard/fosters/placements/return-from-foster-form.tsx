@@ -229,7 +229,7 @@ export function ReturnFromFosterForm({
           <CardFooter className="flex justify-end space-x-4">
             <Button asChild variant="outline" type="button" disabled={isPending}>
               <Link href={`/dashboard/animals/${placement.animal.id}`}>
-                Cancel
+                Cancelar
               </Link>
             </Button>
             <Button type="submit" size="lg" disabled={isPending}>
