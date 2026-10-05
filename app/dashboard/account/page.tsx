@@ -1,0 +1,52 @@
+import PersonForm from "@/components/dashboard/people-directory/person-form";
+import { AppPermissions } from "@/app/lib/auth/permissions";
+import { Authorize } from "@/components/auth/authorize";
+import StatusPage from "@/components/StatusPage";
+import { fetchMyHouseholdProfile, fetchMyProfile } from "@/app/lib/data/people-directory/people-directory.data";
+import { notFound } from "next/navigation";
+import { SearchParamsType } from "@/app/lib/types";
+import { SelfHouseholdForm } from "@/components/dashboard/household/self-household-form";
+
+interface Props {
+  searchParams: SearchParamsType;
+}
+
+const Page = async ({ searchParams }: Props) => {
+  return (
+    <Authorize
+      permission={AppPermissions.MY_PROFILE_UPDATE}
+      fallback={<StatusPage type="accessDenied" />}
+    >
+      <PageContent searchParams={searchParams} />
+    </Authorize>
+  );
+};
+
+const PageContent = async ({ searchParams }: Props) => {
+  const { returnTo } = await searchParams;
+  const resolvedReturnTo = typeof returnTo === "string" ? returnTo : undefined;
+
+  const person = await fetchMyProfile();
+
+  if (!person) {
+    notFound();
+  }
+
+  const householdProfile = await fetchMyHouseholdProfile();
+
+  return (
+    <main className="space-y-8">
+      <PersonForm
+        person={person}
+        mode="self"
+        cancelHref="/dashboard"
+        returnTo={resolvedReturnTo}
+      />
+      <SelfHouseholdForm
+        householdProfile={householdProfile}
+      />
+    </main>
+  );
+};
+
+export default Page;

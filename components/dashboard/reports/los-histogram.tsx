@@ -1,0 +1,68 @@
+"use client";
+
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import type { LosHistogramBucket } from "@/app/lib/utils/length-of-stay";
+
+const chartConfig = {
+  count: {
+    label: "Stays",
+    color: "hsl(var(--chart-1))",
+  },
+} satisfies ChartConfig;
+
+
+export function LosHistogram({
+  data,
+  completedCount,
+}: {
+  data: LosHistogramBucket[];
+  completedCount: number;
+}) {
+  if (completedCount === 0) {
+    return (
+      <p className="text-muted-foreground py-8 text-center text-sm">
+        No completed stays in this period.
+      </p>
+    );
+  }
+
+  return (
+    <ChartContainer
+      config={chartConfig}
+      className="aspect-auto h-[250px] w-full"
+    >
+      <BarChart data={data} margin={{ left: 12, right: 12 }}>
+        <CartesianGrid vertical={false} />
+        <XAxis
+          dataKey="label"
+          tickLine={false}
+          axisLine={false}
+          tickMargin={8}
+        />
+        <YAxis
+          tickLine={false}
+          axisLine={false}
+          width={32}
+          allowDecimals={false}
+        />
+        <ChartTooltip
+          cursor={false}
+          content={
+            <ChartTooltipContent
+              indicator="dot"
+              labelFormatter={(label) => `${label} days`}
+            />
+          }
+        />
+        <Bar dataKey="count" fill="var(--color-count)" radius={4} />
+      </BarChart>
+    </ChartContainer>
+  );
+}

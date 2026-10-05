@@ -1,0 +1,62 @@
+import Link from "next/link";
+
+import type { LongestStayRow } from "@/app/lib/utils/length-of-stay";
+import { formatShelterDay } from "@/app/lib/utils/shelter-day";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+
+export function LongestStaysTable({ rows }: { rows: LongestStayRow[] }) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Animal</TableHead>
+          <TableHead>Species</TableHead>
+          <TableHead className="text-right">Current stay (days)</TableHead>
+          <TableHead className="text-right">Cumulative (days)</TableHead>
+          <TableHead>Intake date</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {rows.length === 0 ? (
+          <TableRow>
+            <TableCell
+              colSpan={5}
+              className="text-muted-foreground text-center"
+            >
+              No animals are currently in care.
+            </TableCell>
+          </TableRow>
+        ) : (
+          rows.map((row) => (
+            <TableRow key={row.animalId}>
+              <TableCell className="font-medium">
+                <Link
+                  href={`/dashboard/animals/${row.animalId}`}
+                  className="hover:underline"
+                >
+                  {row.name}
+                </Link>
+              </TableCell>
+              <TableCell>{row.speciesName}</TableCell>
+              <TableCell className="text-right tabular-nums">
+                {row.currentStayDays}
+              </TableCell>
+              <TableCell className="text-muted-foreground text-right tabular-nums">
+                {row.hasPriorStays ? row.cumulativeDays : "same"}
+              </TableCell>
+              <TableCell>{formatShelterDay(row.intakeDate)}</TableCell>
+            </TableRow>
+          ))
+        )}
+      </TableBody>
+    </Table>
+  );
+}

@@ -1,0 +1,430 @@
+
+
+
+
+
+
+import { after, test } from "node:test";
+import assert from "node:assert/strict";
+import prisma from "@/app/lib/prisma";
+import { NoteEventAction, NoteTargetType } from "@/prisma/generated/enums";
+import { unlinkAccountFromPerson } from "@/app/lib/services/person-account-unlink";
+import { ConflictError, NotFoundError } from "@/app/lib/utils/errors";
+
+const runId = Date.now().toString(36);
+
+after(() => prisma.$disconnect());
+
+
+const makeActor = async () => {
+  const person = await prisma.person.create({
+    data: { name: `Unlink Actor ${runId}` },
+    select: { id: true },
+  });
+  const user = await prisma.user.create({
+    data: {
+      name: `Unlink Actor ${runId}`,
+      email: `actor.${runId}@example.com`,
+      emailVerified: true,
+      personId: person.id,
+    },
+    select: { id: true },
+  });
+  return { userId: user.id, personId: person.id };
+};
+
+
+const STREET = {
+  address: "12 Carmine St",
+  city: "New York",
+  state: "NY",
+  zipCode: "10014",
+};
+
+const makeMislink = async (label: string, email: string) => {
+  const person = await prisma.person.create({
+    data: { name: label, email, phone: "212-555-0100", ...STREET },
+    select: { id: true },
+  });
+  const user = await prisma.user.create({
+    data: {
+      name: `${label} Account`,
+      email,
+      emailVerified: true,
+      personId: person.id,
+    },
+    select: { id: true },
+  });
+  return { personId: person.id, userId: user.id };
+};
+
+const cleanup = async (personIds: string[]) => {
+  
+  
+  await prisma.user.deleteMany({ where: { personId: { in: personIds } } });
+  await prisma.noteEvent.deleteMany({ where: { actorId: { in: personIds } } });
+  await prisma.personNote.deleteMany({
+    where: { personId: { in: personIds } },
+  });
+  await prisma.person.deleteMany({ where: { id: { in: personIds } } });
+};
+
+test("the login moves to a new record and the history stays behind", async (t) => {
+  const actor = await makeActor();
+  const email = `mislinked.${runId}@example.com`;
+  const { personId, userId } = await makeMislink("Bob Recordholder", email);
+
+  
+  const NOTE_CONTENT = "Walked in about a terrier on Tuesday.";
+  const note = await prisma.personNote.create({
+    data: { personId, content: NOTE_CONTENT },
+    select: { id: true },
+  });
+
+  let replacementPersonId = "";
+
+  try {
+    const result = await prisma.$transaction((tx) =>
+      unlinkAccountFromPerson(tx, personId, actor),
+    );
+    replacementPersonId = result.replacementPersonId;
+
+    await t.test("the account keeps working, on a record of its own", async () => {
+      const account = await prisma.user.findUniqueOrThrow({
+        where: { id: userId },
+        select: { personId: true, email: true, emailVerified: true },
+      });
+      assert.equal(account.personId, replacementPersonId);
+      assert.equal(account.email, email, "the sign-in address is untouched");
+      assert.equal(account.emailVerified, true);
+    });
+
+    await t.test("the original record is staff-editable again", async () => {
+      const original = await prisma.person.findUniqueOrThrow({
+        where: { id: personId },
+        select: {
+          user: { select: { id: true } },
+          phone: true,
+          address: true,
+          city: true,
+          state: true,
+          zipCode: true,
+        },
+      });
+      const { user, phone, ...street } = original;
+      assert.equal(user, null);
+      assert.equal(phone, "212-555-0100", "its details are intact");
+      assert.deepEqual(street, STREET, "its street address is intact");
+    });
+
+    await t.test("its notes stay on the record they were about", async () => {
+      const stayed = await prisma.personNote.findUniqueOrThrow({
+        where: { id: note.id },
+        select: { personId: true, content: true },
+      });
+      assert.equal(stayed.personId, personId);
+      assert.equal(stayed.content, NOTE_CONTENT, "and say what they said");
+    });
+
+    await t.test("the replacement starts empty", async () => {
+      const replacement = await prisma.person.findUniqueOrThrow({
+        where: { id: replacementPersonId },
+        select: { phone: true, address: true, adoptionApplications: true },
+      });
+      assert.equal(replacement.phone, null);
+      assert.equal(replacement.address, null);
+      assert.deepEqual(replacement.adoptionApplications, []);
+    });
+
+    await t.test("both records are noted, by the actor", async () => {
+      for (const id of [personId, replacementPersonId]) {
+        const notes = await prisma.personNote.findMany({
+          where: { personId: id, content: { contains: "unlink" } },
+          select: { authorId: true },
+        });
+        assert.equal(notes.length, 1, `exactly one unlink note on ${id}`);
+        assert.equal(notes[0].authorId, actor.personId);
+      }
+    });
+
+    
+    
+    
+    await t.test("each note says what happened and where the login went", async () => {
+      const contentOn = async (id: string) =>
+        (
+          await prisma.personNote.findFirstOrThrow({
+            where: { personId: id, content: { contains: "unlink" } },
+            select: { content: true },
+          })
+        ).content;
+
+      const original = await contentOn(personId);
+      assert.match(original, /unlinked from this record and moved to a new person record/);
+      assert.ok(original.includes(email), "names the account");
+      assert.ok(original.includes('"Bob Recordholder Account"'), "names the new record");
+
+      const replacement = await contentOn(replacementPersonId);
+      assert.match(replacement, /^Created by unlinking a login account/);
+      assert.ok(replacement.includes(email), "names the account");
+      assert.ok(
+        replacement.includes('from the record of "Bob Recordholder"'),
+        "names the record it came from",
+      );
+    });
+
+    
+    
+    await t.test("each note has its NoteEvent, by the actor", async () => {
+      for (const id of [personId, replacementPersonId]) {
+        const unlinkNote = await prisma.personNote.findFirstOrThrow({
+          where: { personId: id, content: { contains: "unlink" } },
+          select: { id: true },
+        });
+        const events = await prisma.noteEvent.findMany({
+          where: { targetId: unlinkNote.id },
+          select: { targetType: true, action: true, actorId: true },
+        });
+        assert.deepEqual(events, [
+          {
+            targetType: NoteTargetType.PERSON,
+            action: NoteEventAction.CREATED,
+            actorId: actor.personId,
+          },
+        ]);
+      }
+    });
+  } finally {
+    await cleanup([personId, replacementPersonId, actor.personId]);
+  }
+});
+
+
+
+
+
+test("the sign-in address leaves with the account when the record held it", async () => {
+  const actor = await makeActor();
+  const email = `follows.${runId}@example.com`;
+  const { personId } = await makeMislink("Address Holder", email);
+
+  let replacementPersonId = "";
+
+  try {
+    const result = await prisma.$transaction((tx) =>
+      unlinkAccountFromPerson(tx, personId, actor),
+    );
+    replacementPersonId = result.replacementPersonId;
+    assert.equal(result.addressFollowedAccount, true);
+
+    const original = await prisma.person.findUniqueOrThrow({
+      where: { id: personId },
+      select: { email: true },
+    });
+    assert.equal(original.email, null);
+
+    const replacement = await prisma.person.findUniqueOrThrow({
+      where: { id: replacementPersonId },
+      select: { email: true, name: true },
+    });
+    assert.equal(replacement.email, email);
+    assert.equal(
+      replacement.name,
+      "Address Holder Account",
+      "the name comes off the account, not off the record it is leaving",
+    );
+  } finally {
+    await cleanup([personId, replacementPersonId, actor.personId]);
+  }
+});
+
+
+
+
+test("a record holding a different address keeps it", async () => {
+  const actor = await makeActor();
+  const accountEmail = `differs.account.${runId}@example.com`;
+  const recordEmail = `differs.record.${runId}@example.com`;
+
+  const person = await prisma.person.create({
+    data: { name: "Divergent Record", email: recordEmail },
+    select: { id: true },
+  });
+  await prisma.user.create({
+    data: {
+      name: "Divergent Account",
+      email: accountEmail,
+      emailVerified: true,
+      personId: person.id,
+    },
+  });
+
+  let replacementPersonId = "";
+
+  try {
+    const result = await prisma.$transaction((tx) =>
+      unlinkAccountFromPerson(tx, person.id, actor),
+    );
+    replacementPersonId = result.replacementPersonId;
+    assert.equal(result.addressFollowedAccount, false);
+
+    const original = await prisma.person.findUniqueOrThrow({
+      where: { id: person.id },
+      select: { email: true },
+    });
+    assert.equal(original.email, recordEmail, "untouched");
+
+    const replacement = await prisma.person.findUniqueOrThrow({
+      where: { id: replacementPersonId },
+      select: { email: true },
+    });
+    assert.equal(replacement.email, accountEmail);
+  } finally {
+    await cleanup([person.id, replacementPersonId, actor.personId]);
+  }
+});
+
+
+
+
+test("a third record holding the address leaves the replacement without one", async () => {
+  const actor = await makeActor();
+  const accountEmail = `contested.${runId}@example.com`;
+
+  const person = await prisma.person.create({
+    data: { name: "Contested Record", email: null },
+    select: { id: true },
+  });
+  await prisma.user.create({
+    data: {
+      name: "Contested Account",
+      email: accountEmail,
+      emailVerified: true,
+      personId: person.id,
+    },
+  });
+  const thirdParty = await prisma.person.create({
+    data: { name: "Third Party", email: accountEmail },
+    select: { id: true },
+  });
+
+  let replacementPersonId = "";
+
+  try {
+    const result = await prisma.$transaction((tx) =>
+      unlinkAccountFromPerson(tx, person.id, actor),
+    );
+    replacementPersonId = result.replacementPersonId;
+
+    const replacement = await prisma.person.findUniqueOrThrow({
+      where: { id: replacementPersonId },
+      select: { email: true },
+    });
+    assert.equal(replacement.email, null);
+
+    const notes = await prisma.personNote.findMany({
+      where: { personId: replacementPersonId },
+      select: { content: true },
+    });
+    assert.equal(notes.length, 1);
+    assert.match(notes[0].content, /already on another person record/);
+
+    const third = await prisma.person.findUniqueOrThrow({
+      where: { id: thirdParty.id },
+      select: { email: true },
+    });
+    assert.equal(third.email, accountEmail, "the third record is untouched");
+  } finally {
+    await cleanup([
+      person.id,
+      replacementPersonId,
+      thirdParty.id,
+      actor.personId,
+    ]);
+  }
+});
+
+test("unlinking your own account is refused", async () => {
+  const actor = await makeActor();
+
+  try {
+    await assert.rejects(
+      prisma.$transaction((tx) =>
+        unlinkAccountFromPerson(tx, actor.personId, actor),
+      ),
+      ConflictError,
+    );
+
+    const stillLinked = await prisma.user.findUniqueOrThrow({
+      where: { id: actor.userId },
+      select: { personId: true },
+    });
+    assert.equal(stillLinked.personId, actor.personId);
+  } finally {
+    await cleanup([actor.personId]);
+  }
+});
+
+test("a walk-in with no account, and a person who does not exist", async () => {
+  const actor = await makeActor();
+  const walkIn = await prisma.person.create({
+    data: { name: `Walk In ${runId}` },
+    select: { id: true },
+  });
+
+  try {
+    await assert.rejects(
+      prisma.$transaction((tx) =>
+        unlinkAccountFromPerson(tx, walkIn.id, actor),
+      ),
+      ConflictError,
+    );
+    await assert.rejects(
+      prisma.$transaction((tx) =>
+        unlinkAccountFromPerson(tx, "cm0000000000000000000000", actor),
+      ),
+      NotFoundError,
+    );
+  } finally {
+    await cleanup([walkIn.id, actor.personId]);
+  }
+});
+
+
+
+test("nothing lands when the transaction fails", async () => {
+  const actor = await makeActor();
+  const email = `rollback.${runId}@example.com`;
+  const { personId, userId } = await makeMislink("Rollback Probe", email);
+
+  try {
+    await assert.rejects(
+      prisma.$transaction(async (tx) => {
+        await unlinkAccountFromPerson(tx, personId, actor);
+        throw new Error("forced rollback");
+      }),
+      /forced rollback/,
+    );
+
+    const account = await prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+      select: { personId: true },
+    });
+    assert.equal(account.personId, personId, "still on the original record");
+
+    const original = await prisma.person.findUniqueOrThrow({
+      where: { id: personId },
+      select: { email: true },
+    });
+    assert.equal(original.email, email, "the address never left");
+
+    const notes = await prisma.personNote.count({ where: { personId } });
+    assert.equal(notes, 0);
+    const events = await prisma.noteEvent.count({
+      where: { actorId: actor.personId },
+    });
+    assert.equal(events, 0, "no audit row without its note");
+  } finally {
+    await cleanup([personId, actor.personId]);
+  }
+});

@@ -1,0 +1,64 @@
+"use client";
+
+import type { Row, StockFeatures } from "@tanstack/react-table";
+import { MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import Link from "next/link";
+import { PersonAdoptionApplicationPayload } from "@/app/lib/data/people-directory/person-adoption-applications.data";
+import { STAFF_EDITABLE_STATUSES } from "@/app/lib/utils/application-status";
+
+interface DataTableRowActionsProps {
+  row: Row<StockFeatures, PersonAdoptionApplicationPayload>;
+  personId: string;
+  canManage: boolean;
+}
+
+export function DataTableRowActions({
+  row,
+  personId,
+  canManage,
+}: DataTableRowActionsProps) {
+  if (!canManage) {
+    return null;
+  }
+
+  const application = row.original;
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+        >
+          <MoreHorizontal className="h-4 w-4" />
+          <span className="sr-only">Open menu</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-40">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <Link
+          href={`/dashboard/adoption-applications/${application.id}/review?returnTo=/dashboard/people-directory/${personId}/adoption-applications`}
+        >
+          <DropdownMenuItem>Review</DropdownMenuItem>
+        </Link>
+        {STAFF_EDITABLE_STATUSES.includes(application.status) && (
+          <Link
+            href={`/dashboard/adoption-applications/${application.id}/edit?returnTo=/dashboard/people-directory/${personId}/adoption-applications`}
+          >
+            <DropdownMenuItem>Edit</DropdownMenuItem>
+          </Link>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}

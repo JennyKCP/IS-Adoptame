@@ -1,0 +1,290 @@
+"use server";
+
+import { getShelterSettings } from "@/app/lib/data/shelter-settings.data";
+
+import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import prisma, { type TransactionClient } from "@/app/lib/prisma";
+import {
+  withAuthenticatedUser,
+  SessionUser,
+  RequirePermission,
+} from "../auth/protected-actions";
+import { AppPermissions } from "@/app/lib/auth/permissions";
+import { cuidSchema } from "../zod-schemas/common.schemas";
+import { VitalsFormInput, VitalsFormSchema } from "../zod-schemas/vitals.schemas";
+import { AnimalActivityType } from "@/prisma/generated/enums";
+import { formatWeight } from "../utils/weight-format";
+import { LATEST_ENTRY_ORDER } from "../utils/vitals-order";
+import type { FieldErrors, FormResult } from "@/app/lib/action-result";
+
+type VitalsResult = FormResult<VitalsFormInput>;
+
+
+
+const toVitalsData = (data: z.output<typeof VitalsFormSchema>) => ({
+  recordedAt: data.recordedAt,
+  weightGrams: data.weightGrams,
+  temperatureC: data.temperatureC,
+  bodyConditionScore: data.bodyConditionScore,
+  notes: data.notes || null,
+});
+
+
+const recomputeCurrentWeight = async (
+  tx: TransactionClient,
+  animalId: string
+): Promise<number | null> => {
+  const latestWeighIn = await tx.vitalsLog.findFirst({
+    where: { animalId, deletedAt: null, weightGrams: { not: null } },
+    orderBy: LATEST_ENTRY_ORDER,
+    select: { weightGrams: true },
+  });
+
+  const currentWeightGrams = latestWeighIn?.weightGrams ?? null;
+  await tx.animal.update({
+    where: { id: animalId },
+    data: { currentWeightGrams },
+  });
+  return currentWeightGrams;
+};
+
+const _createVitalsEntry = async (
+  user: SessionUser, 
+  animalId: string,
+  values: VitalsFormInput,
+): Promise<VitalsResult> => {
+  const parsedAnimalId = cuidSchema.safeParse(animalId);
+  if (!parsedAnimalId.success) {
+    return { ok: false, message: "Invalid animal ID format." };
+  }
+
+  const validatedFields = VitalsFormSchema.safeParse(values);
+  if (!validatedFields.success) {
+    return {
+      ok: false,
+      message: "Missing or invalid fields. Failed to record vitals.",
+      fieldErrors: z.flattenError(validatedFields.error)
+        .fieldErrors as FieldErrors<VitalsFormInput>,
+    };
+  }
+
+  const { weightGrams, recordedAt } = validatedFields.data;
+
+  try {
+    const unitSystem = (await getShelterSettings()).weightUnitSystem;
+    await prisma.$transaction(async (tx) => {
+      
+      
+      
+      
+      
+      
+      const previousWeighIn = await tx.vitalsLog.findFirst({
+        where: {
+          animalId,
+          deletedAt: null,
+          weightGrams: { not: null },
+          recordedAt: { lt: recordedAt },
+        },
+        orderBy: LATEST_ENTRY_ORDER,
+        select: { weightGrams: true },
+      });
+
+      await tx.vitalsLog.create({
+        data: {
+          animalId,
+          recordedById: user.personId,
+          ...toVitalsData(validatedFields.data),
+        },
+      });
+
+      await recomputeCurrentWeight(tx, animalId);
+
+      let changeSummary = "Vitals recorded.";
+      if (weightGrams != null) {
+        changeSummary = `Weight recorded: ${formatWeight(weightGrams, unitSystem)}`;
+        if (previousWeighIn?.weightGrams != null) {
+          const delta = weightGrams - previousWeighIn.weightGrams;
+          if (delta !== 0) {
+            changeSummary += ` (${delta > 0 ? "up" : "down"} ${formatWeight(
+              Math.abs(delta),
+              unitSystem,
+            )})`;
+          }
+        }
+      }
+
+      await tx.animalActivityLog.create({
+        data: {
+          animalId,
+          activityType: AnimalActivityType.VITALS_RECORDED,
+          changedById: user.personId,
+          changeSummary,
+        },
+      });
+    });
+  } catch (error) {
+    console.error("Database Error creating vitals log:", error);
+    return { ok: false, message: "Database Error: Failed to record vitals." };
+  }
+
+  revalidatePath(`/dashboard/animals/${animalId}/vitals`);
+  revalidatePath(`/dashboard/animals/${animalId}`);
+  return { ok: true, message: "Vitals entry recorded successfully." };
+};
+
+const _updateVitalsEntry = async (
+  user: SessionUser, 
+  vitalsLogId: string,
+  animalId: string,
+  values: VitalsFormInput,
+): Promise<VitalsResult> => {
+  const parsedVitalsLogId = cuidSchema.safeParse(vitalsLogId);
+  if (!parsedVitalsLogId.success) {
+    return { ok: false, message: "Invalid vitals log ID format." };
+  }
+  const parsedAnimalId = cuidSchema.safeParse(animalId);
+  if (!parsedAnimalId.success) {
+    return { ok: false, message: "Invalid animal ID format." };
+  }
+
+  const validatedFields = VitalsFormSchema.safeParse(values);
+  if (!validatedFields.success) {
+    return {
+      ok: false,
+      message: "Missing or invalid fields. Failed to update vitals entry.",
+      fieldErrors: z.flattenError(validatedFields.error)
+        .fieldErrors as FieldErrors<VitalsFormInput>,
+    };
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      
+      
+      await tx.vitalsLog.update({
+        where: { id: vitalsLogId, animalId, deletedAt: null },
+        data: toVitalsData(validatedFields.data),
+      });
+
+      await recomputeCurrentWeight(tx, animalId);
+
+      await tx.animalActivityLog.create({
+        data: {
+          animalId,
+          activityType: AnimalActivityType.FIELD_UPDATE,
+          changedById: user.personId,
+          changeSummary: "A vitals entry was updated.",
+        },
+      });
+    });
+  } catch (error) {
+    console.error("Database Error updating vitals log:", error);
+    return { ok: false, message: "Database Error: Failed to update vitals entry." };
+  }
+
+  revalidatePath(`/dashboard/animals/${animalId}/vitals`);
+  revalidatePath(`/dashboard/animals/${animalId}`);
+  return { ok: true, message: "Vitals entry updated successfully." };
+};
+
+const _deleteVitalsEntry = async (
+  user: SessionUser, 
+  vitalsLogId: string,
+  animalId: string
+) => {
+  const parsedVitalsLogId = cuidSchema.safeParse(vitalsLogId);
+  if (!parsedVitalsLogId.success) {
+    return { message: "Invalid vitals log ID format." };
+  }
+  const parsedAnimalId = cuidSchema.safeParse(animalId);
+  if (!parsedAnimalId.success) {
+    return { message: "Invalid animal ID format." };
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.vitalsLog.update({
+        where: { id: parsedVitalsLogId.data, animalId },
+        data: { deletedAt: new Date() },
+      });
+
+      await recomputeCurrentWeight(tx, animalId);
+
+      await tx.animalActivityLog.create({
+        data: {
+          animalId,
+          activityType: AnimalActivityType.FIELD_UPDATE,
+          changedById: user.personId,
+          changeSummary: "A vitals entry was deleted.",
+        },
+      });
+    });
+
+    revalidatePath(`/dashboard/animals/${animalId}/vitals`);
+    revalidatePath(`/dashboard/animals/${animalId}`);
+    return { message: "Vitals entry deleted successfully." };
+  } catch (error) {
+    console.error("Database Error deleting vitals log:", error);
+    return { message: "Database Error: Failed to delete vitals entry." };
+  }
+};
+
+const _restoreVitalsEntry = async (
+  user: SessionUser, 
+  vitalsLogId: string,
+  animalId: string
+) => {
+  const parsedVitalsLogId = cuidSchema.safeParse(vitalsLogId);
+  if (!parsedVitalsLogId.success) {
+    return { message: "Invalid vitals log ID format." };
+  }
+  const parsedAnimalId = cuidSchema.safeParse(animalId);
+  if (!parsedAnimalId.success) {
+    return { message: "Invalid animal ID format." };
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      await tx.vitalsLog.update({
+        where: { id: parsedVitalsLogId.data, animalId },
+        data: { deletedAt: null },
+      });
+
+      await recomputeCurrentWeight(tx, animalId);
+
+      await tx.animalActivityLog.create({
+        data: {
+          animalId,
+          activityType: AnimalActivityType.FIELD_UPDATE,
+          changedById: user.personId,
+          changeSummary: "A vitals entry was restored.",
+        },
+      });
+    });
+
+    revalidatePath(`/dashboard/animals/${animalId}/vitals`);
+    revalidatePath(`/dashboard/animals/${animalId}`);
+    return { message: "Vitals entry restored successfully." };
+  } catch (error) {
+    console.error("Database Error restoring vitals log:", error);
+    return { message: "Database Error: Failed to restore vitals entry." };
+  }
+};
+
+export const createVitalsEntry = withAuthenticatedUser(
+  RequirePermission(AppPermissions.ANIMAL_VITALS_MANAGE)(_createVitalsEntry)
+);
+
+export const updateVitalsEntry = withAuthenticatedUser(
+  RequirePermission(AppPermissions.ANIMAL_VITALS_MANAGE)(_updateVitalsEntry)
+);
+
+export const deleteVitalsEntry = withAuthenticatedUser(
+  RequirePermission(AppPermissions.ANIMAL_VITALS_MANAGE)(_deleteVitalsEntry)
+);
+
+export const restoreVitalsEntry = withAuthenticatedUser(
+  RequirePermission(AppPermissions.ANIMAL_VITALS_MANAGE)(_restoreVitalsEntry)
+);

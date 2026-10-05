@@ -1,0 +1,173 @@
+"use client";
+
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { US_STATES } from "@/app/lib/constants/us-states";
+import type { UseFormReturn } from "react-hook-form";
+import type { PersonFormValues } from "./person-form";
+
+interface PersonFormFieldsProps {
+  form: UseFormReturn<PersonFormValues>;
+  mode: "staff" | "self";
+}
+
+export const PersonFormFields = ({
+  form,
+  mode,
+}: PersonFormFieldsProps) => (
+  <div className="space-y-6">
+    <h3 className="font-semibold border-b pb-2">Información de contacto</h3>
+    {mode !== "self" && (
+      <p className="text-sm text-muted-foreground">
+        Proporciona al menos un correo electrónico o un número de teléfono para
+        poder contactar a esta persona.
+      </p>
+    )}
+    <div className="grid grid-cols-1 md:grid-cols-6 gap-x-4 gap-y-8">
+      <FormField
+        control={form.control}
+        name="name"
+        render={({ field }) => (
+          <FormItem className="col-span-4">
+            <FormLabel required>Nombre</FormLabel>
+            <FormControl>
+              <Input
+                placeholder="p. ej., Jane Doe"
+                {...field}
+                autoComplete="off"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="email"
+        render={({ field }) => (
+          <FormItem className="col-span-3">
+            <FormLabel>
+              Correo electrónico
+              {mode !== "self" && (
+                <span className="text-muted-foreground font-normal">
+                  {" "}
+                  (o teléfono)
+                </span>
+              )}
+            </FormLabel>
+            <FormControl>
+              <Input
+                type="email"
+                placeholder="e.g., jane@example.com"
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="phone"
+        render={({ field }) => (
+          <FormItem className="col-span-3">
+            <FormLabel>
+              Teléfono
+              {mode !== "self" && (
+                <span className="text-muted-foreground font-normal">
+                  {" "}
+                  (o correo electrónico)
+                </span>
+              )}
+            </FormLabel>
+            <FormControl>
+              <Input placeholder="e.g., (555) 123-4567" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="address"
+        render={({ field }) => (
+          <FormItem className="col-span-full">
+            <FormLabel>Dirección</FormLabel>
+            <FormControl>
+              <Input placeholder="e.g., 123 Main St" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="city"
+        render={({ field }) => (
+          <FormItem className="col-span-2">
+            <FormLabel>Ciudad</FormLabel>
+            <FormControl>
+              <Input placeholder="e.g., Anytown" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="state"
+        render={({ field }) => (
+          <FormItem className="col-span-2">
+            <FormLabel>Estado</FormLabel>
+            <Select
+              name={field.name}
+              autoComplete="address-level1"
+              onValueChange={field.onChange}
+              value={field.value ?? ""}
+            >
+              <FormControl>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecciona un estado" />
+                </SelectTrigger>
+              </FormControl>
+              <SelectContent>
+                {US_STATES.map((state) => (
+                  <SelectItem key={state.code} value={state.code}>
+                    {state.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="zipCode"
+        render={({ field }) => (
+          <FormItem className="col-span-2">
+            <FormLabel>Código postal</FormLabel>
+            <FormControl>
+              <Input placeholder="e.g., 12345" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+    </div>
+  </div>
+);

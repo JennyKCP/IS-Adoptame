@@ -1,0 +1,1562 @@
+
+generator client {
+  provider        = "prisma-client"
+  output          = "./generated"
+
+
+
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum Role {
+  ADMIN
+  STAFF
+  USER
+  VOLUNTEER
+}
+
+model Person {
+  id              String  @id @default(cuid())
+  name            String
+  email           String? @unique
+  phone           String?
+  phoneNormalized String?
+  address         String?
+  city            String?
+  state           String?
+  zipCode         String?
+
+
+  user User?
+
+
+  fosterProfile    FosterProfile?
+  householdProfile HouseholdProfile?
+
+  adoptionApplications       AdoptionApplication[]
+  applicationStatusHistory   ApplicationStatusHistory[]
+  fosterApplications         FosterApplication[]
+  fosterApplicationHistory   FosterApplicationStatusHistory[]
+  fosterPlacementsPlaced     FosterPlacement[]                @relation("FosterPlacementPlacedBy")
+  fosterPlacementsReturned   FosterPlacement[]                @relation("FosterPlacementReturnedBy")
+  favorites                  Favorite[]
+  animalNotesAuthored        AnimalNote[]                     @relation("AnimalNoteAuthor")
+  personNotesAuthored        PersonNote[]                     @relation("PersonNoteAuthor")
+  partnerNotesAuthored       PartnerNote[]                    @relation("PartnerNoteAuthor")
+  animalNotesEdited          AnimalNote[]                     @relation("AnimalNoteLastEditor")
+  personNotesEdited          PersonNote[]                     @relation("PersonNoteLastEditor")
+  partnerNotesEdited         PartnerNote[]                    @relation("PartnerNoteLastEditor")
+  adoptionApplicationsEdited AdoptionApplication[]            @relation("AdoptionApplicationLastEditor")
+  householdProfilesEdited    HouseholdProfile[]               @relation("HouseholdProfileLastEditor")
+  noteEvents                 NoteEvent[]                      @relation("NoteEventActor")
+  personNotes                PersonNote[]                     @relation("PersonNoteSubject")
+  partnerContacts            PartnerContact[]
+  tasksAssigned              Task[]                           @relation("TasksAssignedTo")
+  tasksCreated               Task[]                           @relation("TasksCreatedBy")
+  reclaimedAnimalsAsOwner    Outcome[]                        @relation("ReclaimedByOwner")
+  processedOutcomes          Outcome[]                        @relation("ProcessedOutcome")
+  reversedOutcomes           Outcome[]                        @relation("ReversedOutcome")
+  surrenderedAnimals         Intake[]                         @relation("SurrenderedBy")
+  foundAnimals               Intake[]                         @relation("FoundBy")
+  processedIntakes           Intake[]                         @relation("ProcessedBy")
+
+
+
+
+
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  MedicationLog     MedicationLog[]
+  AnimalActivityLog AnimalActivityLog[]
+  aiActionLogs      AiActionLog[]
+  vitalsLogs        VitalsLog[]
+  assessments       Assessment[]
+  characteristicsAssigned AnimalCharacteristic[] @relation("CharacteristicAssignedBy")
+  characteristicsRemoved  AnimalCharacteristic[] @relation("CharacteristicRemovedBy")
+
+  @@index([phoneNormalized])
+  @@map("persons")
+}
+
+model User {
+  id            String  @id @default(cuid())
+
+
+
+
+
+  name          String
+
+
+
+
+
+  email         String  @unique
+  emailVerified Boolean @default(false) @map(name: "email_verified")
+  image         String?
+  role          Role    @default(USER)
+
+
+  personId String @unique
+
+  person   Person @relation(fields: [personId], references: [id], onDelete: Restrict)
+
+  sessions Session[]
+  accounts Account[]
+
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  deactivatedAt DateTime? @map(name: "deactivated_at")
+
+  @@map(name: "users")
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  expiresAt DateTime @map(name: "expires_at")
+  ipAddress String?  @map(name: "ip_address")
+  userAgent String?  @map(name: "user_agent")
+
+  userId String @map(name: "user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@index([userId])
+  @@map(name: "sessions")
+}
+
+model Account {
+  id         String @id @default(cuid())
+  accountId  String @map(name: "account_id")
+  providerId String @map(name: "provider_id")
+
+  userId String @map(name: "user_id")
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  accessToken           String?   @map(name: "access_token")
+  refreshToken          String?   @map(name: "refresh_token")
+  idToken               String?   @map(name: "id_token")
+  accessTokenExpiresAt  DateTime? @map(name: "access_token_expires_at")
+  refreshTokenExpiresAt DateTime? @map(name: "refresh_token_expires_at")
+  scope                 String?
+
+  password              String?
+
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+  @@map(name: "accounts")
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime @map(name: "expires_at")
+
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+
+  @@index([identifier])
+  @@map(name: "verifications")
+}
+
+
+enum LivingSituation {
+  OWN_HOME
+  RENT_APARTMENT
+  RENT_HOUSE
+  LIVE_WITH_FAMILY
+  OTHER
+}
+
+enum FosterStatus {
+  ACTIVE
+  PAUSED
+  INACTIVE
+}
+
+model FosterProfile {
+  id            String       @id @default(cuid())
+  status        FosterStatus @default(ACTIVE)
+  internalNotes String?
+
+  maxAnimals         Int      @default(1) @map(name: "max_animals")
+  hasQuarantineSpace Boolean? @map(name: "has_quarantine_space")
+  canGiveOralMeds    Boolean? @map(name: "can_give_oral_meds")
+  canBottleFeed      Boolean? @map(name: "can_bottle_feed")
+  canTransport       Boolean? @map(name: "can_transport")
+  acceptsMedical     Boolean? @map(name: "accepts_medical")
+  acceptsHospice     Boolean? @map(name: "accepts_hospice")
+  availabilityNotes  String?  @map(name: "availability_notes")
+
+  speciesCapabilities Species[] @relation("FosterProfileSpeciesCapability")
+
+  approvedAt DateTime? @map(name: "approved_at")
+
+  personId String @unique @map(name: "person_id")
+
+  person   Person @relation(fields: [personId], references: [id], onDelete: Restrict)
+
+  placements FosterPlacement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("foster_profiles")
+}
+
+model HouseholdProfile {
+  id       String @id @default(cuid())
+  personId String @unique @map(name: "person_id")
+  person   Person @relation(fields: [personId], references: [id], onDelete: Cascade)
+
+  livingSituation         LivingSituation @map(name: "living_situation")
+  hasYard                 Boolean?        @map(name: "has_yard")
+  landlordPermission      Boolean?        @map(name: "landlord_permission")
+  householdSize           Int             @map(name: "household_size")
+  hasChildren             Boolean?        @map(name: "has_children")
+  childrenAges            Int[]           @map(name: "children_ages")
+  otherAnimalsDescription String?         @map(name: "other_animals_description")
+  animalExperience        String?         @map(name: "animal_experience")
+
+
+
+
+
+  lastEditedById String?   @map(name: "last_edited_by_id")
+  lastEditedBy   Person?   @relation("HouseholdProfileLastEditor", fields: [lastEditedById], references: [id], onDelete: SetNull)
+  lastEditedAt   DateTime? @map(name: "last_edited_at")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("household_profiles")
+}
+
+
+enum PartnerType {
+  SHELTER
+  RESCUE_GROUP
+  VET_CLINIC
+  GOVERNMENT_AGENCY
+}
+
+model Partner {
+  id   String      @id @default(cuid())
+  name String      @unique
+  type PartnerType
+
+
+  email   String?
+  phone   String?
+  website String?
+  address String?
+  city    String?
+  state   String?
+  zipCode String?
+
+
+  isActive Boolean @default(true)
+
+
+  notes String?
+
+
+  contacts     PartnerContact[]
+  partnerNotes PartnerNote[]
+
+  transferredInAnimals  Intake[]
+  transferredOutAnimals Outcome[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("partners")
+}
+
+model PartnerContact {
+  id        String  @id @default(cuid())
+  partnerId String
+  partner   Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  personId  String
+  person    Person  @relation(fields: [personId], references: [id])
+
+  role      String?
+  isPrimary Boolean @default(false)
+  isActive  Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([partnerId, personId])
+
+
+
+  @@unique([partnerId], map: "partner_contact_one_primary", where: { isPrimary: true })
+  @@map("partner_contacts")
+}
+
+model ShelterSettings {
+  id                  String   @id @default("shelter")
+  timezone            String
+  weightUnitSystem    String
+  defaultPhoneCountry String
+
+  phoneIndexCountry   String?
+  updatedAt           DateTime @updatedAt
+
+  @@map("shelter_settings")
+}
+
+
+enum LocationType {
+  KENNEL
+  ISOLATION
+  MEDICAL
+  QUARANTINE
+  OFFSITE
+  OTHER
+}
+
+model Location {
+  id   String       @id @default(cuid())
+  name String       @unique
+  type LocationType
+
+  units Unit[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map(name: "deleted_at")
+
+  @@map("locations")
+}
+
+model Unit {
+  id         String   @id @default(cuid())
+  locationId String   @map(name: "location_id")
+  location   Location @relation(fields: [locationId], references: [id])
+  name       String
+  capacity   Int      @default(1)
+
+  animals Animal[]
+
+
+  fosterPlacementsAsPrevious FosterPlacement[]
+
+
+  outcomesAsPrevious Outcome[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map(name: "deleted_at")
+
+  @@unique([name, locationId])
+  @@index([locationId])
+  @@map("units")
+}
+
+
+enum Sex {
+  MALE
+  FEMALE
+  UNKNOWN
+}
+
+enum AnimalSize {
+  SMALL
+  MEDIUM
+  LARGE
+  XLARGE
+}
+
+enum AnimalHealthStatus {
+  HEALTHY
+  AWAITING_VET_EXAM
+  AWAITING_TRIAGE
+  UNDER_VET_CARE
+  HOSPITALISED
+  AWAITING_SPAY_NEUTER
+  AWAITING_OTHER_SURGERY
+  RECOVERING_FROM_SURGERY
+}
+
+enum AnimalListingStatus {
+  DRAFT
+  PUBLISHED
+
+  PENDING_ADOPTION
+
+
+  ARCHIVED
+}
+
+enum CharacteristicCategory {
+  BEHAVIOR
+  MEDICAL
+  ENVIRONMENT
+  ADMINISTRATIVE
+  OTHER
+}
+
+model Animal {
+  id                 String              @id @default(cuid())
+  name               String
+  birthDate          String            @map(name: "birth_date")
+  sex                Sex
+
+
+
+
+  size               AnimalSize?
+
+
+
+  currentWeightGrams Int?                @map(name: "current_weight_grams")
+  heightCm           Float?              @map(name: "height_cm")
+  description        String?
+  listingStatus      AnimalListingStatus @default(DRAFT)
+  microchipNumber    String?             @unique
+  archiveReason      OutcomeType?
+
+
+
+  speciesId            String                @map("species_id")
+  species              Species               @relation(fields: [speciesId], references: [id])
+  breeds               Breed[]
+  colors               Color[]
+  primaryColorId       String                @map("primary_color_id")
+  primaryColor         Color                 @relation("PrimaryColor", fields: [primaryColorId], references: [id])
+
+
+
+
+  animalCharacteristics AnimalCharacteristic[]
+  animalImages         AnimalImage[]
+  medicalRecords       MedicalRecord[]
+  vitalsLogs           VitalsLog[]
+  notes                AnimalNote[]
+  tasks                Task[]
+  favorites            Favorite[]
+  adoptionApplications AdoptionApplication[]
+  intake               Intake[]
+  Outcome              Outcome[]
+  activityLog          AnimalActivityLog[]
+  healthStatus         AnimalHealthStatus?
+
+
+
+
+
+  isSpayedNeutered Boolean @default(false)
+
+
+
+  fosterPlacements FosterPlacement[]
+
+
+  currentUnitId String? @map(name: "current_unit_id")
+  currentUnit   Unit?   @relation(fields: [currentUnitId], references: [id], onDelete: SetNull)
+
+  MedicationSchedule MedicationSchedule[]
+  MedicationLog      MedicationLog[]
+  assessments        Assessment[]
+
+  createdAt   DateTime  @default(now()) @map(name: "created_at")
+  updatedAt   DateTime  @updatedAt @map(name: "updated_at")
+  publishedAt DateTime? @map(name: "published_at")
+
+  @@index([currentUnitId])
+  @@map(name: "animals")
+}
+
+model Species {
+  id      String   @id @default(cuid())
+  name    String   @unique
+  animals Animal[]
+  breeds  Breed[]
+
+  fosterProfiles     FosterProfile[]     @relation("FosterProfileSpeciesCapability")
+  fosterApplications FosterApplication[] @relation("FosterApplicationSpeciesCapability")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map(name: "deleted_at")
+
+  @@map(name: "species")
+}
+
+model Breed {
+  id        String   @id @default(cuid())
+  name      String
+  animals   Animal[]
+  speciesId String   @map(name: "species_id")
+  species   Species  @relation(fields: [speciesId], references: [id])
+
+
+
+
+  typicalSize AnimalSize? @map(name: "typical_size")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map(name: "deleted_at")
+
+  @@unique([name, speciesId])
+  @@map(name: "breeds")
+}
+
+model Color {
+  id                String   @id @default(cuid())
+  name              String   @unique
+  animals           Animal[]
+  primaryForAnimals Animal[] @relation("PrimaryColor")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map(name: "deleted_at")
+
+  @@map(name: "colors")
+}
+
+model Characteristic {
+  id       String                 @id @default(cuid())
+  name     String                 @unique
+  category CharacteristicCategory
+
+
+  animalCharacteristics AnimalCharacteristic[]
+
+
+  proposedByFields AssessmentTemplateField[] @relation("CharacteristicProposedByFields")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map(name: "deleted_at")
+
+  @@map("characteristics")
+}
+
+model AnimalCharacteristic {
+  id String @id @default(cuid())
+
+  animalId String
+  animal   Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  characteristicId String
+  characteristic   Characteristic @relation(fields: [characteristicId], references: [id], onDelete: Cascade)
+
+  assignedById String
+  assignedBy   Person   @relation("CharacteristicAssignedBy", fields: [assignedById], references: [id])
+  assignedAt   DateTime @default(now()) @map(name: "assigned_at")
+
+
+
+
+  sourceAssessmentId String?
+  sourceAssessment   Assessment? @relation(fields: [sourceAssessmentId], references: [id], onDelete: SetNull)
+
+
+
+  note String?
+
+
+
+  removedAt   DateTime? @map(name: "removed_at")
+  removedById String?
+  removedBy   Person?   @relation("CharacteristicRemovedBy", fields: [removedById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([animalId, characteristicId])
+  @@index([characteristicId])
+  @@index([sourceAssessmentId])
+  @@map("animal_characteristics")
+}
+
+model AnimalImage {
+  id  String @id @default(cuid())
+  url String
+
+
+
+
+
+  sortOrder Int @default(0) @map(name: "sort_order")
+
+  animalId String @map(name: "animal_id")
+  animal   Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([animalId, sortOrder])
+  @@map(name: "animal_images")
+}
+
+
+enum IntakeType {
+  OWNER_SURRENDER
+  STRAY
+  BORN_IN_CARE
+  TRANSFER_IN
+  SEIZE
+  SERVICE_IN
+  ACO_IMPOUND
+}
+
+enum OutcomeType {
+  ADOPTION
+  TRANSFER_OUT
+  RETURN_TO_OWNER
+  DECEASED
+  EUTHANIZED
+  OTHER
+}
+
+model Intake {
+  id String @id @default(cuid())
+
+
+
+  intakeDate String
+
+  type IntakeType
+
+  animalId String
+
+
+  animal Animal @relation(fields: [animalId], references: [id])
+
+
+
+
+  surrenderingPersonId String?
+  surrenderingPerson   Person? @relation(name: "SurrenderedBy", fields: [surrenderingPersonId], references: [id])
+
+
+  dateLost        String?
+  foundAddress    String?
+  foundCity       String?
+  foundState      String?
+  foundZipCode    String?
+  foundByPersonId String?
+  foundByPerson   Person?   @relation(name: "FoundBy", fields: [foundByPersonId], references: [id])
+
+
+  sourcePartnerId String?
+  sourcePartner   Partner? @relation(fields: [sourcePartnerId], references: [id])
+
+
+  staffMemberId String
+  staffMember   Person  @relation(name: "ProcessedBy", fields: [staffMemberId], references: [id])
+  notes         String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([animalId])
+  @@index([sourcePartnerId])
+  @@index([staffMemberId])
+  @@map("intakes")
+}
+
+model Outcome {
+  id String @id @default(cuid())
+
+
+
+  outcomeDate String
+
+  type OutcomeType
+
+  animalId String
+
+  animal   Animal @relation(fields: [animalId], references: [id])
+
+
+
+
+
+
+
+  adoptionApplicationId String?
+  adoptionApplication   AdoptionApplication? @relation(fields: [adoptionApplicationId], references: [id])
+
+
+  fosterPlacement FosterPlacement?
+
+
+  ownerId String?
+  owner   Person? @relation("ReclaimedByOwner", fields: [ownerId], references: [id])
+
+
+  destinationPartnerId String?
+  destinationPartner   Partner? @relation(fields: [destinationPartnerId], references: [id])
+
+
+  staffMemberId String
+  staffMember   Person  @relation(name: "ProcessedOutcome", fields: [staffMemberId], references: [id])
+  notes         String?
+
+
+
+
+
+
+  previousListingStatus AnimalListingStatus?
+
+
+
+
+
+
+  previousUnitId String?
+  previousUnit   Unit?   @relation(fields: [previousUnitId], references: [id], onDelete: SetNull)
+
+
+
+
+
+
+  reversedAt     DateTime?
+  reversedById   String?
+  reversedBy     Person?   @relation(name: "ReversedOutcome", fields: [reversedById], references: [id])
+  reversalReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+
+
+
+  @@unique([adoptionApplicationId], where: { reversedAt: null })
+  @@index([animalId])
+  @@map("outcomes")
+}
+
+
+enum MedicalRecordType {
+  VACCINATION
+  PROCEDURE
+  MEDICATION
+  ALLERGY
+  CHECKUP
+  NOTE
+}
+
+model MedicalRecord {
+  id           String            @id @default(cuid())
+  type         MedicalRecordType
+  title        String
+  details      String?
+  dateOfRecord String          @map(name: "date_of_record")
+  documentUrl  String?           @map(name: "document_url")
+
+  animalId String @map(name: "animal_id")
+  animal   Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([animalId])
+  @@map(name: "medical_records")
+}
+
+model VitalsLog {
+  id String @id @default(cuid())
+
+
+
+
+
+
+  recordedAt DateTime @default(now()) @map(name: "recorded_at")
+
+
+
+  weightGrams        Int?   @map(name: "weight_grams")
+  temperatureC       Float? @map(name: "temperature_c")
+
+  bodyConditionScore Int?   @map(name: "body_condition_score")
+
+  notes String?
+
+  animalId String @map(name: "animal_id")
+  animal   Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  recordedById String @map(name: "recorded_by_id")
+  recordedBy   Person @relation(fields: [recordedById], references: [id])
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map(name: "deleted_at")
+
+  @@index([animalId, recordedAt])
+  @@map("vitals_logs")
+}
+
+
+model MedicationSchedule {
+  id             String  @id @default(cuid())
+  medicationName String
+  dosage         Float
+  dosageUnit     String
+  route          String
+  instructions   String?
+  isActive       Boolean @default(true)
+
+
+
+  startDate      String
+  repeatInterval Int
+  repeatUnit     String
+  timesPerDay    Int       @default(1)
+
+
+  endByDate      String?
+
+  animalId String @map("animal_id")
+  animal   Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+
+  administrations MedicationLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([animalId])
+  @@map("medication_schedules")
+}
+
+model MedicationLog {
+  id String @id @default(cuid())
+
+  administeredAt DateTime @default(now())
+  notes          String?
+
+
+  administeredById String
+  administeredBy   Person @relation(fields: [administeredById], references: [id])
+
+
+  scheduleId String
+  schedule   MedicationSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+
+  animalId String
+  animal   Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+
+  taskId String? @unique
+  task   Task?   @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([animalId])
+  @@index([scheduleId])
+  @@map("medication_logs")
+}
+
+
+enum AssessmentSignal {
+  NO_CONCERNS
+  MONITOR
+  FOLLOW_UP
+  ESCALATE
+}
+
+enum FieldType {
+  SHORT_TEXT
+  LONG_TEXT
+  NUMBER
+  SINGLE_SELECT
+  MULTI_SELECT
+  BOOLEAN
+}
+
+model AssessmentTemplate {
+  id          String  @id @default(cuid())
+
+
+
+  key         String
+  version     Int     @default(1)
+  name        String
+  description String?
+
+
+
+
+
+  species String?
+
+
+  stage   String?
+
+  isActive Boolean @default(true)
+
+
+
+
+  supersededById String?             @unique
+  supersededBy   AssessmentTemplate? @relation("TemplateVersionChain", fields: [supersededById], references: [id], onDelete: SetNull)
+  supersedes     AssessmentTemplate? @relation("TemplateVersionChain")
+
+  fields      AssessmentTemplateField[]
+  assessments Assessment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([key, version])
+  @@map("assessment_templates")
+}
+
+model AssessmentTemplateField {
+  id         String             @id @default(cuid())
+  templateId String
+  template   AssessmentTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+
+
+  key              String
+  label            String
+  fieldType        FieldType
+
+
+  options          String[]
+
+
+  concerningValues String[]
+  isRequired       Boolean   @default(false)
+  order            Int
+
+
+
+
+
+
+
+
+
+  proposesCharacteristicId String?
+  proposesCharacteristic   Characteristic? @relation("CharacteristicProposedByFields", fields: [proposesCharacteristicId], references: [id], onDelete: SetNull)
+
+
+  proposesOnValues         String[]
+
+  answers AssessmentAnswer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([templateId, key])
+  @@index([templateId])
+  @@index([proposesCharacteristicId])
+  @@map("assessment_template_fields")
+}
+
+model Assessment {
+  id String @id @default(cuid())
+
+  animalId String
+  animal   Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  templateId String
+  template   AssessmentTemplate @relation(fields: [templateId], references: [id])
+
+  assessorId String
+  assessor   Person @relation(fields: [assessorId], references: [id])
+
+
+
+
+  observedAt DateTime @default(now()) @map(name: "observed_at")
+
+  signal  AssessmentSignal @default(NO_CONCERNS)
+  summary String?
+
+  answers AssessmentAnswer[]
+
+
+  sourcedCharacteristics AnimalCharacteristic[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map(name: "deleted_at")
+
+  @@index([animalId, observedAt])
+  @@index([templateId])
+  @@map("assessments")
+}
+
+model AssessmentAnswer {
+  id String @id @default(cuid())
+
+  assessmentId String
+  assessment   Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+
+
+
+  templateFieldId String
+  templateField   AssessmentTemplateField @relation(fields: [templateFieldId], references: [id])
+
+
+
+  questionLabel String
+  value         String
+
+
+  valueNumber   Float?
+  notes         String?
+
+  createdAt DateTime @default(now())
+
+  @@index([assessmentId])
+  @@index([templateFieldId])
+  @@map("assessment_answers")
+}
+
+
+enum ApplicationStatus {
+  PENDING
+  REVIEWING
+  WAITLISTED
+  APPROVED
+  REJECTED
+  WITHDRAWN
+}
+
+enum ApplicationSource {
+  SELF
+  STAFF
+}
+
+model AdoptionApplication {
+  id String @id @default(cuid())
+
+
+  applicantName         String  @map(name: "applicant_name")
+  applicantEmail        String  @map(name: "applicant_email")
+  applicantPhone        String  @map(name: "applicant_phone")
+  applicantAddressLine1 String  @map(name: "applicant_address_line1")
+  applicantAddressLine2 String? @map(name: "applicant_address_line2")
+  applicantCity         String  @map(name: "applicant_city")
+  applicantState        String  @map(name: "applicant_state")
+  applicantZipCode      String  @map(name: "applicant_zip_code")
+
+
+  livingSituation         LivingSituation @map(name: "living_situation")
+  hasYard                 Boolean?        @map(name: "has_yard")
+  landlordPermission      Boolean?        @map(name: "landlord_permission")
+  householdSize           Int             @map(name: "household_size")
+  hasChildren             Boolean?        @map(name: "has_children")
+  childrenAges            Int[]           @map(name: "children_ages")
+  otherAnimalsDescription String?         @map(name: "other_animals_description")
+  animalExperience        String?         @map(name: "animal_experience")
+  reasonForAdoption       String          @map(name: "reason_for_adoption")
+
+
+  status        ApplicationStatus @default(PENDING)
+  internalNotes String?
+
+
+
+  source ApplicationSource
+
+
+
+
+
+  lastEditedById String?   @map(name: "last_edited_by_id")
+  lastEditedBy   Person?   @relation("AdoptionApplicationLastEditor", fields: [lastEditedById], references: [id], onDelete: SetNull)
+  lastEditedAt   DateTime? @map(name: "last_edited_at")
+
+  outcomes        Outcome[]
+  history         ApplicationStatusHistory[]
+  fosterPlacement FosterPlacement?
+
+
+  applicantId String @map(name: "applicant_id")
+  applicant   Person @relation(fields: [applicantId], references: [id], onDelete: Restrict)
+  animalId    String @map(name: "animal_id")
+  animal      Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  submittedAt DateTime @default(now()) @map(name: "submitted_at")
+  updatedAt   DateTime @updatedAt @map(name: "updated_at")
+
+  @@index([animalId])
+  @@index([applicantId])
+  @@index([status])
+  @@index([animalId, status])
+  @@map(name: "adoption_applications")
+}
+
+model ApplicationStatusHistory {
+  id            String              @id @default(cuid())
+  applicationId String              @map(name: "application_id")
+  application   AdoptionApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  status             ApplicationStatus
+  statusChangeReason String
+
+  changedAt DateTime @default(now()) @map(name: "changed_at")
+
+  changedById String? @map(name: "changed_by_id")
+  changedBy   Person? @relation(fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@index([applicationId])
+  @@map(name: "application_status_history")
+}
+
+
+model FosterApplication {
+  id String @id @default(cuid())
+
+
+  applicantName         String  @map(name: "applicant_name")
+  applicantEmail        String  @map(name: "applicant_email")
+  applicantPhone        String  @map(name: "applicant_phone")
+  applicantAddressLine1 String  @map(name: "applicant_address_line1")
+  applicantAddressLine2 String? @map(name: "applicant_address_line2")
+  applicantCity         String  @map(name: "applicant_city")
+  applicantState        String  @map(name: "applicant_state")
+  applicantZipCode      String  @map(name: "applicant_zip_code")
+
+
+  livingSituation         LivingSituation @map(name: "living_situation")
+  hasYard                 Boolean?        @map(name: "has_yard")
+  landlordPermission      Boolean?        @map(name: "landlord_permission")
+  householdSize           Int             @map(name: "household_size")
+  hasChildren             Boolean?        @map(name: "has_children")
+  childrenAges            Int[]           @map(name: "children_ages")
+  otherAnimalsDescription String?         @map(name: "other_animals_description")
+  animalExperience        String?         @map(name: "animal_experience")
+
+
+  maxAnimals          Int       @default(1) @map(name: "max_animals")
+  hasQuarantineSpace  Boolean?  @map(name: "has_quarantine_space")
+  canGiveOralMeds     Boolean?  @map(name: "can_give_oral_meds")
+  canBottleFeed       Boolean?  @map(name: "can_bottle_feed")
+  canTransport        Boolean?  @map(name: "can_transport")
+  acceptsMedical      Boolean?  @map(name: "accepts_medical")
+  acceptsHospice      Boolean?  @map(name: "accepts_hospice")
+  availabilityNotes   String?   @map(name: "availability_notes")
+  speciesCapabilities Species[] @relation("FosterApplicationSpeciesCapability")
+
+
+  status        ApplicationStatus @default(PENDING)
+  internalNotes String?
+
+  history FosterApplicationStatusHistory[]
+
+  personId String @map(name: "person_id")
+
+  person   Person @relation(fields: [personId], references: [id], onDelete: Restrict)
+
+  submittedAt DateTime @default(now()) @map(name: "submitted_at")
+  updatedAt   DateTime @updatedAt @map(name: "updated_at")
+
+  @@index([personId])
+  @@index([status])
+  @@map(name: "foster_applications")
+}
+
+model FosterApplicationStatusHistory {
+  id            String            @id @default(cuid())
+  applicationId String            @map(name: "application_id")
+  application   FosterApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  status             ApplicationStatus
+  statusChangeReason String
+
+  changedAt DateTime @default(now()) @map(name: "changed_at")
+
+  changedById String? @map(name: "changed_by_id")
+  changedBy   Person? @relation(fields: [changedById], references: [id], onDelete: SetNull)
+
+  @@index([applicationId])
+  @@map(name: "foster_application_status_history")
+}
+
+enum FosterPlacementType {
+  GENERAL
+  MEDICAL
+  FOSTER_TO_ADOPT
+  LONG_TERM
+}
+
+enum FosterReturnReason {
+  RETURNED_TO_SHELTER
+  ADOPTED_BY_FOSTER
+  TRANSFERRED
+  MEDICAL
+  OTHER
+
+
+
+  ENDED_BY_OUTCOME
+}
+
+model FosterPlacement {
+  id   String              @id @default(cuid())
+  type FosterPlacementType
+
+  startDate       String    @map(name: "start_date")
+  expectedEndDate String?   @map(name: "expected_end_date")
+  endDate         String?   @map(name: "end_date")
+
+  returnReason FosterReturnReason? @map(name: "return_reason")
+  returnNotes  String?             @map(name: "return_notes")
+
+  animalId String @map(name: "animal_id")
+
+  animal   Animal @relation(fields: [animalId], references: [id], onDelete: Restrict)
+
+  fosterProfileId String        @map(name: "foster_profile_id")
+
+  fosterProfile   FosterProfile @relation(fields: [fosterProfileId], references: [id], onDelete: Restrict)
+
+
+  previousUnitId String? @map(name: "previous_unit_id")
+  previousUnit   Unit?   @relation(fields: [previousUnitId], references: [id], onDelete: SetNull)
+
+
+
+  previousListingStatus AnimalListingStatus? @map(name: "previous_listing_status")
+
+
+  placedById String @map(name: "placed_by_id")
+  placedBy   Person @relation("FosterPlacementPlacedBy", fields: [placedById], references: [id])
+
+  returnedById String? @map(name: "returned_by_id")
+  returnedBy   Person? @relation("FosterPlacementReturnedBy", fields: [returnedById], references: [id])
+
+
+  adoptionApplicationId String?              @unique @map(name: "adoption_application_id")
+  adoptionApplication   AdoptionApplication? @relation(fields: [adoptionApplicationId], references: [id], onDelete: SetNull)
+
+  outcomeId String?  @unique @map(name: "outcome_id")
+  outcome   Outcome? @relation(fields: [outcomeId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+
+
+  @@index([animalId])
+  @@index([fosterProfileId])
+  @@map("foster_placements")
+}
+
+model Favorite {
+  id String @id @default(cuid())
+
+  animalId String @map(name: "animal_id")
+  animal   Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  userId String @map(name: "user_id")
+  user   Person @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, animalId])
+  @@map(name: "favorites")
+}
+
+
+enum TaskCategory {
+  MEDICAL
+  BEHAVIORAL
+  ADMINISTRATIVE
+  CLEANING
+  FEEDING
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  DONE
+  SKIPPED
+  CANCELED
+  ON_HOLD
+  DELETED
+}
+
+enum TaskPriority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum NoteCategory {
+  BEHAVIORAL
+  MEDICAL
+  FEEDING
+  GENERAL
+  ADOPTION_UPDATE
+  FOSTER_UPDATE
+}
+
+enum NoteTargetType {
+  ANIMAL
+  PERSON
+  PARTNER
+}
+
+enum NoteEventAction {
+  CREATED
+  EDITED
+  DELETED
+  RESTORED
+}
+
+model Task {
+  id      String  @id @default(cuid())
+  title   String
+  details String?
+
+  status   TaskStatus   @default(TODO)
+  priority TaskPriority @default(MEDIUM)
+  category TaskCategory
+  dueDate  String?      @map(name: "due_date")
+
+  animalId String @map(name: "animal_id")
+  animal   Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+
+  assigneeId String? @map(name: "assignee_id")
+  assignee   Person? @relation("TasksAssignedTo", fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  medicationLog MedicationLog?
+
+  createdById String @map("created_by_id")
+  createdBy   Person @relation("TasksCreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([animalId])
+  @@index([assigneeId])
+  @@index([status])
+  @@map(name: "tasks")
+}
+
+model AnimalNote {
+  id       String       @id @default(cuid())
+  category NoteCategory
+  content  String
+
+  animalId String @map(name: "animal_id")
+  animal   Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  authorId String? @map(name: "author_id")
+  author   Person? @relation("AnimalNoteAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  lastEditedById String?   @map(name: "last_edited_by_id")
+  lastEditedBy   Person?   @relation("AnimalNoteLastEditor", fields: [lastEditedById], references: [id], onDelete: SetNull)
+  lastEditedAt   DateTime? @map(name: "last_edited_at")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map(name: "deleted_at")
+
+  @@index([animalId])
+  @@map(name: "animal_notes")
+}
+
+model PersonNote {
+  id      String @id @default(cuid())
+  content String
+
+  personId String @map(name: "person_id")
+  person   Person @relation("PersonNoteSubject", fields: [personId], references: [id], onDelete: Cascade)
+
+  authorId String? @map(name: "author_id")
+  author   Person? @relation("PersonNoteAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  lastEditedById String?   @map(name: "last_edited_by_id")
+  lastEditedBy   Person?   @relation("PersonNoteLastEditor", fields: [lastEditedById], references: [id], onDelete: SetNull)
+  lastEditedAt   DateTime? @map(name: "last_edited_at")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map(name: "deleted_at")
+
+  @@index([personId])
+  @@map("person_notes")
+}
+
+model PartnerNote {
+  id      String @id @default(cuid())
+  content String
+
+  partnerId String  @map(name: "partner_id")
+  partner   Partner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+
+  authorId String? @map(name: "author_id")
+  author   Person? @relation("PartnerNoteAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+
+  lastEditedById String?   @map(name: "last_edited_by_id")
+  lastEditedBy   Person?   @relation("PartnerNoteLastEditor", fields: [lastEditedById], references: [id], onDelete: SetNull)
+  lastEditedAt   DateTime? @map(name: "last_edited_at")
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? @map(name: "deleted_at")
+
+  @@index([partnerId])
+  @@map("partner_notes")
+}
+
+model NoteEvent {
+  id         String          @id @default(cuid())
+  targetType NoteTargetType
+  targetId   String          @map(name: "target_id")
+  action     NoteEventAction
+
+  actorId String @map(name: "actor_id")
+  actor   Person @relation("NoteEventActor", fields: [actorId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@index([actorId])
+  @@map(name: "note_events")
+}
+
+
+enum AnimalActivityType {
+  FIELD_UPDATE
+  NOTE_ADDED
+  PHOTO_UPLOADED
+  MEDICAL_RECORD_ADDED
+  ASSESSMENT_COMPLETED
+  VITALS_RECORDED
+  TASK_CREATED
+  TASK_STATUS_CHANGED
+  TASK_UPDATED
+  TASK_ASSIGNED
+  STATUS_CHANGE
+  INTAKE_PROCESSED
+  OUTCOME_PROCESSED
+  CREATED
+  LOCATION_CHANGE
+  FOSTER_PLACED
+  FOSTER_RETURNED
+  NOTE_EDITED
+  NOTE_DELETED
+  NOTE_RESTORED
+  OUTCOME_CORRECTED
+  OUTCOME_REVERSED
+  INTAKE_CORRECTED
+}
+
+model AnimalActivityLog {
+  id           String             @id @default(cuid())
+  activityType AnimalActivityType
+
+  animalId String
+  animal   Animal @relation(fields: [animalId], references: [id], onDelete: Cascade)
+
+  changedById String
+  changedBy   Person @relation(fields: [changedById], references: [id])
+
+  changeSummary String?
+
+  changedAt DateTime @default(now())
+
+  @@map("animal_activity_logs")
+}
+
+model AiActionLog {
+  id String @id @default(cuid())
+
+  toolName   String
+
+
+
+
+
+
+  toolCallId String
+  approvalId String? @unique
+
+  targetType AiActionTargetType
+  targetId   String
+
+  input  Json
+  before Json
+  after  Json
+
+  actorId String @map("actor_id")
+  actor   Person @relation(fields: [actorId], references: [id])
+
+  undoneAt DateTime? @map("undone_at")
+
+  createdAt DateTime @default(now())
+
+  @@index([targetType, targetId])
+  @@index([actorId])
+  @@map("ai_action_logs")
+}
+
+enum AiActionTargetType {
+  TASK
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

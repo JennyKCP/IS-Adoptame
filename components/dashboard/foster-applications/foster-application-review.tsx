@@ -1,0 +1,264 @@
+"use client";
+
+import { useTransition } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
+import { toast } from "sonner";
+import { z } from "zod";
+import { Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { updateFosterApplicationStatus } from "@/app/lib/actions/foster-application.actions";
+import { applyFieldErrors } from "@/app/lib/utils/form-result-utils";
+import { allowedNextStatuses } from "@/app/lib/utils/application-status";
+import { FosterApplicationStatusChangeSchema } from "@/app/lib/zod-schemas/foster.schemas";
+import { MyFosterApplicationPayload } from "@/app/lib/types";
+import { formatDateOrNA } from "@/app/lib/utils/date-utils";
+import { HouseholdReadOnlyRows } from "@/components/dashboard/household/household-read-only";
+import { CapabilityReadOnlyRows } from "@/components/dashboard/my-foster-application/foster-application-status";
+import { StatusHistoryTimeline } from "@/components/dashboard/applications/status-history-timeline";
+import { FosterApplicationStatuses } from "@/components/dashboard/foster-applications/table/foster-applications-options";
+
+type StatusChangeFormValues = z.input<typeof FosterApplicationStatusChangeSchema>;
+
+const ApplicantInfoReadOnlyRows = ({
+  application,
+}: {
+  application: MyFosterApplicationPayload;
+}) => (
+  <div className="space-y-1">
+    <div className="flex items-center justify-between border-b pb-2 text-sm">
+      <span className="text-muted-foreground">Name</span>
+      <span>{application.applicantName}</span>
+    </div>
+    <div className="flex items-center justify-between border-b pb-2 text-sm">
+      <span className="text-muted-foreground">Email</span>
+      <span>{application.applicantEmail}</span>
+    </div>
+    <div className="flex items-center justify-between border-b pb-2 text-sm">
+      <span className="text-muted-foreground">Phone</span>
+      <span>{application.applicantPhone}</span>
+    </div>
+    <div className="flex items-center justify-between border-b pb-2 text-sm">
+      <span className="text-muted-foreground">Address</span>
+      <span className="text-right">
+        {application.applicantAddressLine1}
+        {application.applicantAddressLine2
+          ? `, ${application.applicantAddressLine2}`
+          : ""}
+        <br />
+        {application.applicantCity}, {application.applicantState}{" "}
+        {application.applicantZipCode}
+      </span>
+    </div>
+  </div>
+);
+
+interface FosterApplicationReviewProps {
+  application: MyFosterApplicationPayload;
+  canManage: boolean;
+}
+
+export function FosterApplicationReview({
+  application,
+  canManage,
+}: FosterApplicationReviewProps) {
+  const statusMeta = FosterApplicationStatuses.find(
+    (s) => s.value === application.status,
+  );
+
+  const nextStatuses = allowedNextStatuses(application.status);
+
+  const [isPending, startSubmitTransition] = useTransition();
+
+  const form = useForm<StatusChangeFormValues>({
+    resolver: standardSchemaResolver(FosterApplicationStatusChangeSchema),
+    defaultValues: {
+      applicationId: application.id,
+      status: application.status as StatusChangeFormValues["status"],
+      statusChangeReason: "",
+    },
+  });
+
+  
+  
+  const newStatus = useWatch({ control: form.control, name: "status" });
+  const isStatusChanging = newStatus && newStatus !== application.status;
+
+  
+  
+  
+  const onSubmit = (values: StatusChangeFormValues) => {
+    startSubmitTransition(async () => {
+      const result = await updateFosterApplicationStatus(values);
+
+      if (result.ok) {
+        toast.success(result.message);
+        form.reset({ ...values, statusChangeReason: "" });
+        return;
+      }
+
+      applyFieldErrors(form, result.fieldErrors);
+      toast.error(result.message);
+    });
+  };
+
+  return (
+    <div className="space-y-8 max-w-4xl mx-auto">
+      <Card className={canManage ? "border-primary" : undefined}>
+        <CardHeader>
+          <CardTitle className="flex flex-wrap items-center gap-2">
+            {application.applicantName}
+            {statusMeta && (
+              <Badge variant="outline" className="flex w-fit items-center">
+                {statusMeta.icon && (
+                  <statusMeta.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+                )}
+                {statusMeta.label}
+              </Badge>
+            )}
+          </CardTitle>
+          <CardDescription>
+            Foster application submitted {formatDateOrNA(application.submittedAt)}.
+          </CardDescription>
+        </CardHeader>
+        {canManage && (
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
+                <FormField
+                  control={form.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel required>Application Status</FormLabel>
+                      <Select
+                        name={field.name}
+                        onValueChange={field.onChange}
+                        value={field.value ?? ""}
+                        disabled={isPending || nextStatuses.length === 0}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a new status">
+                              {FosterApplicationStatuses.find(
+                                (s) => s.value === field.value,
+                              )?.label ?? field.value}
+                            </SelectValue>
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {nextStatuses.map((status) => {
+                            const meta = FosterApplicationStatuses.find(
+                              (s) => s.value === status,
+                            );
+                            return (
+                              <SelectItem key={status} value={status}>
+                                {meta?.label ?? status}
+                              </SelectItem>
+                            );
+                          })}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {isStatusChanging && (
+                  <FormField
+                    control={form.control}
+                    name="statusChangeReason"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel required>Reason for Status Change</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Provide a reason for changing the status..."
+                            className="resize-y"
+                            disabled={isPending}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
+
+                <div className="flex justify-end">
+                  <Button type="submit" disabled={isPending || !isStatusChanging}>
+                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isPending ? "Updating..." : "Update Status"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </CardContent>
+        )}
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Applicant Information</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <ApplicantInfoReadOnlyRows application={application} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Household & Lifestyle</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <HouseholdReadOnlyRows hp={application} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Foster Capabilities</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <CapabilityReadOnlyRows application={application} />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Status History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <StatusHistoryTimeline history={application.history} />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}

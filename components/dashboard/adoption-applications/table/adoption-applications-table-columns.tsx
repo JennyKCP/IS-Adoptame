@@ -1,0 +1,177 @@
+"use client";
+
+import type { ColumnDef, StockFeatures } from "@tanstack/react-table";
+import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ApplicationStatuses } from "./adoption-applications-options";
+import { DataTableColumnHeader } from "../../../table-common/data-table-column-header";
+import { DataTableRowActions } from "./adoption-applications-table-row-actions";
+import { AdoptionApplicationWithAnimal } from "@/app/lib/data/user-adoption-application.data";
+import { TimeAgo } from "@/components/common/time-ago";
+import Link from "next/link";
+
+export interface GetColumnsProps {
+  canManage: boolean;
+}
+
+export const getColumns = ({
+  canManage,
+}: GetColumnsProps): ColumnDef<StockFeatures, AdoptionApplicationWithAnimal>[] => [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+        className="translate-y-0.5"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+        className="translate-y-0.5"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+  },
+  {
+    accessorKey: "applicantName",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Applicant Name" />
+    ),
+    meta: {
+      displayName: "Applicant Name",
+    },
+    cell: ({ row }) => {
+      const status = ApplicationStatuses.find(
+        (status) => status.value === row.original.status,
+      );
+
+      return (
+        <div className="flex space-x-2">
+          {status && <Badge variant="outline">{status.label}</Badge>}
+          <Link
+            href={`/dashboard/people-directory/${row.original.applicantId}`}
+            className="max-w-125 truncate font-medium hover:underline"
+          >
+            {row.getValue("applicantName")}
+          </Link>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "applicantEmail",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Applicant Email" />
+    ),
+    meta: {
+      displayName: "Applicant Email",
+    },
+    cell: ({ row }) => (
+      <span className="max-w-100 truncate">
+        {row.getValue("applicantEmail")}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "applicantPhone",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Applicant Phone" />
+    ),
+    meta: {
+      displayName: "Applicant Phone",
+    },
+    cell: ({ row }) => (
+      <span className="max-w-100 truncate">
+        {row.getValue("applicantPhone")}
+      </span>
+    ),
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => {
+      const status = ApplicationStatuses.find(
+        (status) => status.value === row.getValue("status"),
+      );
+
+      if (!status) {
+        return null;
+      }
+
+      return (
+        <Badge variant="outline" className="flex w-fit items-center">
+          {status.icon && (
+            <status.icon className="mr-2 h-4 w-4 text-muted-foreground" />
+          )}
+          <span>{status.label}</span>
+        </Badge>
+      );
+    },
+    filterFn: (row, id, value) => {
+      return value.includes(row.getValue(id));
+    },
+  },
+  {
+    id: "animalName",
+    accessorFn: (row) => row.animal.name,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Animal Name" />
+    ),
+    meta: {
+      displayName: "Animal Name",
+    },
+    cell: ({ row }) => {
+      const animal = row.original.animal;
+      return (
+        <span className="font-medium hover:underline">
+          <Link href={`/dashboard/animals/${animal.id}`}>{animal.name}</Link>
+        </span>
+      );
+    },
+  },
+  {
+    id: "animalSpecies",
+    accessorFn: (row) => row.animal.species.name,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Animal Species" />
+    ),
+    meta: {
+      displayName: "Species",
+    },
+    cell: ({ row }) => {
+      return (
+        <span className="max-w-100 truncate">
+          {row.original.animal.species.name}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "submittedAt",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Submitted At" />
+    ),
+    meta: {
+      displayName: "Submitted At",
+    },
+    cell: ({ row }) => {
+      const date = row.getValue("submittedAt") as string | Date | null;
+      return <TimeAgo date={date} />;
+    },
+  },
+  {
+    id: "actions",
+    cell: ({ row }) => <DataTableRowActions row={row} canManage={canManage} />,
+  },
+];

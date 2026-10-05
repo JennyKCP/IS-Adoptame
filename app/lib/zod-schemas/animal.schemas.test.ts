@@ -1,0 +1,115 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { z } from "zod";
+import {
+  AnimalEditFormSchema,
+  CreateAnimalFormSchema,
+  createTaskFormSchema,
+  TaskFormSchema,
+} from "./animal.schemas";
+import {
+  AnimalHealthStatus,
+  AnimalListingStatus,
+  IntakeType,
+  Sex,
+  TaskCategory,
+} from "@/prisma/generated/enums";
+import { calendarDay } from "@/app/lib/utils/shelter-day";
+
+const baseInput = {
+  animalName: "Biscuit",
+  species: "cmtn2bxpz00gancgsd6hyf79q",
+  breed: "cmtn2bxpz00gancgsd6hyf79r",
+  primaryColor: "cmtn2bxpz00gancgsd6hyf79s",
+  additionalColors: [],
+  sex: Sex.FEMALE,
+  estimatedBirthDate: "2024-01-01",
+  healthStatus: AnimalHealthStatus.AWAITING_VET_EXAM,
+  listingStatus: AnimalListingStatus.DRAFT as AnimalListingStatus,
+  heightCm: null,
+  weightGrams: null,
+  isSpayedNeutered: false,
+  intakeType: IntakeType.SEIZE,
+  intakeDate: "2026-01-01",
+};
+
+test("CreateAnimalFormSchema: a new animal can be a draft or published", () => {
+  for (const listingStatus of [
+    AnimalListingStatus.DRAFT,
+    AnimalListingStatus.PUBLISHED,
+  ]) {
+    const result = CreateAnimalFormSchema.safeParse({
+      ...baseInput,
+      listingStatus,
+    });
+    assert.equal(result.success, true, listingStatus);
+  }
+});
+
+test("CreateAnimalFormSchema: a new animal cannot be archived or pending adoption", () => {
+  
+  
+  
+  for (const listingStatus of [
+    AnimalListingStatus.ARCHIVED,
+    AnimalListingStatus.PENDING_ADOPTION,
+  ]) {
+    const result = CreateAnimalFormSchema.safeParse({
+      ...baseInput,
+      listingStatus,
+    });
+    assert.equal(result.success, false, listingStatus);
+    if (result.success) continue;
+    assert.deepEqual(z.flattenError(result.error).fieldErrors.listingStatus, [
+      "A new animal can only be a draft or published.",
+    ]);
+  }
+});
+
+test("CreateAnimalFormSchema: a missing listing status still asks for one", () => {
+  const { listingStatus: _omitted, ...withoutListing } = baseInput;
+  const result = CreateAnimalFormSchema.safeParse(withoutListing);
+  assert.equal(result.success, false);
+  if (result.success) return;
+  assert.deepEqual(z.flattenError(result.error).fieldErrors.listingStatus, [
+    "Listing status is required.",
+  ]);
+});
+
+test("AnimalEditFormSchema: the edit form still resubmits a locked listing", () => {
+  
+  
+  const {
+    intakeType: _t,
+    intakeDate: _d,
+    weightGrams: _w,
+    ...editInput
+  } = baseInput;
+  for (const listingStatus of [
+    AnimalListingStatus.ARCHIVED,
+    AnimalListingStatus.PENDING_ADOPTION,
+  ]) {
+    const result = AnimalEditFormSchema.safeParse({
+      ...editInput,
+      listingStatus,
+    });
+    assert.equal(result.success, true, listingStatus);
+  }
+});
+
+test("TaskFormSchema: a cleared due date parses as no due date", () => {
+  
+  const input = {
+    title: "Walk",
+    category: TaskCategory.FEEDING,
+    dueDate: null,
+  };
+  for (const schema of [
+    TaskFormSchema,
+    createTaskFormSchema(calendarDay("2026-09-21")),
+  ]) {
+    const result = schema.safeParse(input);
+    assert.equal(result.success, true);
+    assert.equal(result.data?.dueDate, null);
+  }
+});

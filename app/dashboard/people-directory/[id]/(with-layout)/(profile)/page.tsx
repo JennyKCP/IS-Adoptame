@@ -1,0 +1,143 @@
+import { IDParamType } from "@/app/lib/types";
+import { Authorize } from "@/components/auth/authorize";
+import StatusPage from "@/components/StatusPage";
+import { AppPermissions } from "@/app/lib/auth/permissions";
+import { fetchPersonProfileTabData } from "@/app/lib/data/people-directory/people-directory.data";
+import { hasPermission } from "@/app/lib/auth/hasPermission";
+import { notFound } from "next/navigation";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { formatSingleEnumOption } from "@/app/lib/utils/enum-formatter";
+import { HouseholdProfileCard } from "@/components/dashboard/household/household-profile-card";
+import { UnlinkAccountButton } from "@/components/dashboard/people-directory/unlink-account-button";
+
+interface Props {
+  params: IDParamType;
+}
+
+const Page = async ({ params }: Props) => {
+  return (
+    <Authorize
+      permission={AppPermissions.PERSONS_READ}
+      fallback={<StatusPage type="accessDenied" />}
+    >
+      <PageContent params={params} />
+    </Authorize>
+  );
+};
+
+const PageContent = async ({ params }: Props) => {
+  const { id } = await params;
+
+  const [person, canManage, canUnlinkAccount] = await Promise.all([
+    fetchPersonProfileTabData(id),
+    hasPermission(AppPermissions.PERSONS_MANAGE),
+    hasPermission(AppPermissions.PERSON_ACCOUNT_UNLINK),
+  ]);
+
+  if (!person) {
+    notFound();
+  }
+
+  return (
+    <div className="@container/profile-cards">
+      <div className="grid grid-cols-1 gap-4 @[700px]/profile-cards:grid-cols-2">
+        
+        <Card>
+          <CardHeader>
+            <CardTitle>Contact & Account Details</CardTitle>
+            <CardDescription>Address and login account information.</CardDescription>
+            {canManage && (
+              <CardAction>
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/dashboard/people-directory/${id}/edit`}>
+                    Edit Contact Info
+                  </Link>
+                </Button>
+              </CardAction>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+                Address
+              </p>
+              <div className="space-y-1">
+                <div className="flex items-center justify-between border-b pb-2 text-sm">
+                  <span className="text-muted-foreground">Street</span>
+                  <span>{person.address || "N/A"}</span>
+                </div>
+                <div className="flex items-center justify-between border-b pb-2 text-sm">
+                  <span className="text-muted-foreground">City</span>
+                  <span>{person.city || "N/A"}</span>
+                </div>
+                <div className="flex items-center justify-between border-b pb-2 text-sm">
+                  <span className="text-muted-foreground">State</span>
+                  <span>{person.state || "N/A"}</span>
+                </div>
+                <div className="flex items-center justify-between border-b pb-2 text-sm">
+                  <span className="text-muted-foreground">Zip Code</span>
+                  <span>{person.zipCode || "N/A"}</span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+                Account Information
+              </p>
+              <div className="space-y-1">
+                <div className="flex items-center justify-between border-b pb-2 text-sm">
+                  <span className="text-muted-foreground">Login Account</span>
+                  <span>{person.user ? "Yes" : "No"}</span>
+                </div>
+                {person.user && (
+                  <>
+                    <div className="flex items-center justify-between border-b pb-2 text-sm">
+                      <span className="text-muted-foreground">Sign-in Email</span>
+                      <span>{person.user.email}</span>
+                    </div>
+                    <div className="flex items-center justify-between border-b pb-2 text-sm">
+                      <span className="text-muted-foreground">Role</span>
+                      <span>{formatSingleEnumOption(person.user.role)}</span>
+                    </div>
+                    <div className="flex items-center justify-between border-b pb-2 text-sm">
+                      <span className="text-muted-foreground">Correo verificado</span>
+                      <span>{person.user.emailVerified ? "Yes" : "No"}</span>
+                    </div>
+                  </>
+                )}
+              </div>
+              {person.user && canUnlinkAccount && (
+                <div className="mt-4 flex justify-end">
+                  <UnlinkAccountButton
+                    personId={person.id}
+                    personName={person.name}
+                    accountEmail={person.user.email}
+                  />
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        
+        <HouseholdProfileCard
+          householdProfile={person.householdProfile}
+          personId={person.id}
+          canManage={canManage}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default Page;
