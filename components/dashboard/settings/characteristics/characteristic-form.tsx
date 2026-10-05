@@ -84,11 +84,11 @@ export const CharacteristicForm = ({ onFormSubmit, characteristic }: Props) => {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="name" required>Name</FormLabel>
+                <FormLabel htmlFor="name" required>Nombre</FormLabel>
                 <FormControl>
                   <Input
                     id="name"
-                    placeholder="e.g. Good with kids"
+                    placeholder="Ej.: Se lleva bien con niños"
                     {...field}
                   />
                 </FormControl>
@@ -103,7 +103,7 @@ export const CharacteristicForm = ({ onFormSubmit, characteristic }: Props) => {
             name="category"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="category" required>Category</FormLabel>
+                <FormLabel htmlFor="category" required>Categoría</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   value={field.value ?? ""}
@@ -111,7 +111,7 @@ export const CharacteristicForm = ({ onFormSubmit, characteristic }: Props) => {
                 >
                   <FormControl>
                     <SelectTrigger className="w-full" id="category">
-                      <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder="Selecciona una categoría" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -131,7 +131,7 @@ export const CharacteristicForm = ({ onFormSubmit, characteristic }: Props) => {
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="outline" disabled={isPending}>
-              Cancel
+              Cancelar
             </Button>
           </DialogClose>
           <Button type="submit" disabled={isPending}>
@@ -141,9 +141,9 @@ export const CharacteristicForm = ({ onFormSubmit, characteristic }: Props) => {
                 {characteristic ? "Updating..." : "Creating..."}
               </>
             ) : characteristic ? (
-              "Update Characteristic"
+              "Actualizar característica"
             ) : (
-              "Create Characteristic"
+              "Crear característica"
             )}
           </Button>
         </DialogFooter>

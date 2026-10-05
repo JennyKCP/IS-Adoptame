@@ -120,7 +120,7 @@ const ReIntakeForm = ({
                   name="healthStatus"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel required>Health Status</FormLabel>
+                      <FormLabel required>Estado de salud</FormLabel>
                       <Select
                         name={field.name}
                         onValueChange={field.onChange}
@@ -128,7 +128,7 @@ const ReIntakeForm = ({
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select health status" />
+                            <SelectValue placeholder="Selecciona el estado de salud" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -180,7 +180,7 @@ const ReIntakeForm = ({
               type="button"
               disabled={isPending}
             >
-              <Link href={`/dashboard/animals/${animal.id}`}>Cancel</Link>
+              <Link href={`/dashboard/animals/${animal.id}`}>Cancelar</Link>
             </Button>
             <Button type="submit" size="lg" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

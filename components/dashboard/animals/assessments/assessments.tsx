@@ -87,7 +87,7 @@ const AnimalAssessmentsTab = ({
           />
           <ServerSideSort
             paramKey="sort"
-            placeholder="Select order"
+            placeholder="Seleccionar orden"
             options={[
               { label: "Newest First", value: "observedAt.desc" },
               { label: "Oldest First", value: "observedAt.asc" },

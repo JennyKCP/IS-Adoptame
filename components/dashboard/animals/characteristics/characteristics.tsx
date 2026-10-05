@@ -305,7 +305,7 @@ const AnimalCharacteristicsManager = ({
             </PopoverTrigger>
             <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
               <Command>
-                <CommandInput placeholder="Search characteristics..." />
+                <CommandInput placeholder="Buscar características..." />
                 <CommandList>
                   <CommandEmpty>No characteristic found.</CommandEmpty>
                   <CommandGroup>

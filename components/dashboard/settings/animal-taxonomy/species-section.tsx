@@ -75,11 +75,11 @@ function SpeciesActions({ species }: { species: SpeciesModel }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DialogTrigger asChild>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>Editar</DropdownMenuItem>
           </DialogTrigger>
           {species.deletedAt ? (
             <DropdownMenuItem onClick={onRestore} disabled={isPending}>
-              Restore
+              Restaurar
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem
@@ -87,7 +87,7 @@ function SpeciesActions({ species }: { species: SpeciesModel }) {
               onClick={onSoftDelete}
               disabled={isPending}
             >
-              Delete
+              Eliminar
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
@@ -95,9 +95,9 @@ function SpeciesActions({ species }: { species: SpeciesModel }) {
 
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle>Edit Species</DialogTitle>
+          <DialogTitle>Editar especie</DialogTitle>
           <DialogDescription>
-            Update the name for this species. Click update when you&apos;re
+            Actualiza el nombre de esta especie. Haz clic en actualizar cuando
             done.
           </DialogDescription>
         </DialogHeader>
@@ -136,7 +136,7 @@ export const SpeciesSection = ({ species }: Props) => {
               <DialogHeader>
                 <DialogTitle>Add Species</DialogTitle>
                 <DialogDescription>
-                  Create a new species. Click create when you&apos;re done.
+                  Crea una especie nueva. Haz clic en crear cuando termines.
                 </DialogDescription>
               </DialogHeader>
               <SpeciesForm onFormSubmit={() => setIsAddDialogOpen(false)} />

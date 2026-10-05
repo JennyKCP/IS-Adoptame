@@ -439,7 +439,7 @@ export async function ReadinessBoard({ board, filterOptions, can, filterParams }
     <Card className="@container/main">
       <CardHeader>
         <CardTitle className="@[650px]/main:text-xl">
-          <h1>Readiness Board</h1>
+          <h1>Panel de preparación</h1>
         </CardTitle>
         <CardDescription>
           What&apos;s still outstanding before each animal is fully ready for

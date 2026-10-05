@@ -20,7 +20,7 @@ export const columns: ColumnDef<StockFeatures, MyAdoptionApplicationPayload>[] =
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label="Seleccionar todo"
         className="translate-y-0.5"
       />
     ),
@@ -28,7 +28,7 @@ export const columns: ColumnDef<StockFeatures, MyAdoptionApplicationPayload>[] =
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
+        aria-label="Seleccionar fila"
         className="translate-y-0.5"
       />
     ),
@@ -39,7 +39,7 @@ export const columns: ColumnDef<StockFeatures, MyAdoptionApplicationPayload>[] =
     id: "animalName",
     accessorFn: (row) => row.animal.name,
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Pet Name" />
+      <DataTableColumnHeader column={column} title="Nombre de la mascota" />
     ),
     meta: {
       displayName: "Animal Name",
@@ -66,7 +66,7 @@ export const columns: ColumnDef<StockFeatures, MyAdoptionApplicationPayload>[] =
   {
     accessorKey: "applicantName",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Applicant Name" />
+      <DataTableColumnHeader column={column} title="Nombre del solicitante" />
     ),
     meta: {
       displayName: "Applicant Name",

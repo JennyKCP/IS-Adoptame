@@ -88,7 +88,7 @@ export function NoteActions({ note, animalId }: NoteActionsProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DialogTrigger asChild>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>Editar</DropdownMenuItem>
           </DialogTrigger>
           {note.deletedAt ? (
             <DropdownMenuItem onClick={onRestore} disabled={isPending}>

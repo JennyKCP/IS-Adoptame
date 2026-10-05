@@ -25,7 +25,7 @@ export const getColumns = ({
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label="Seleccionar todo"
         className="translate-y-0.5"
       />
     ),
@@ -33,7 +33,7 @@ export const getColumns = ({
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
+        aria-label="Seleccionar fila"
         className="translate-y-0.5"
       />
     ),
@@ -43,7 +43,7 @@ export const getColumns = ({
   {
     accessorKey: "name",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
+      <DataTableColumnHeader column={column} title="Nombre" />
     ),
     cell: ({ row }) => {
       return (
@@ -98,7 +98,7 @@ export const getColumns = ({
   {
     accessorKey: "phone",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Phone" />
+      <DataTableColumnHeader column={column} title="Teléfono" />
     ),
     cell: ({ row }) => {
       const phone = row.getValue("phone") as string | null;
@@ -112,7 +112,7 @@ export const getColumns = ({
   {
     accessorKey: "city",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="City" />
+      <DataTableColumnHeader column={column} title="Ciudad" />
     ),
     cell: ({ row }) => {
       const city = row.getValue("city") as string | null;
@@ -126,7 +126,7 @@ export const getColumns = ({
   {
     accessorKey: "state",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="State" />
+      <DataTableColumnHeader column={column} title="Estado" />
     ),
     cell: ({ row }) => {
       const state = row.getValue("state") as string | null;

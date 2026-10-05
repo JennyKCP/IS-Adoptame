@@ -70,7 +70,7 @@ export const UnitForm = ({ onFormSubmit, locationId, unit }: Props) => {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="name" required>Name</FormLabel>
+                <FormLabel htmlFor="name" required>Nombre</FormLabel>
                 <FormControl>
                   <Input id="name" placeholder="e.g. A-1" {...field} />
                 </FormControl>
@@ -98,7 +98,7 @@ export const UnitForm = ({ onFormSubmit, locationId, unit }: Props) => {
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="outline" disabled={isPending}>
-              Cancel
+              Cancelar
             </Button>
           </DialogClose>
           <Button type="submit" disabled={isPending}>
@@ -108,9 +108,9 @@ export const UnitForm = ({ onFormSubmit, locationId, unit }: Props) => {
                 {unit ? "Updating..." : "Creating..."}
               </>
             ) : unit ? (
-              "Update Unit"
+              "Actualizar unidad"
             ) : (
-              "Create Unit"
+              "Crear unidad"
             )}
           </Button>
         </DialogFooter>

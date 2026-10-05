@@ -78,9 +78,9 @@ export const LocationForm = ({ onFormSubmit, location }: Props) => {
             name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel htmlFor="name" required>Name</FormLabel>
+                <FormLabel htmlFor="name" required>Nombre</FormLabel>
                 <FormControl>
-                  <Input id="name" placeholder="e.g. Main Kennel" {...field} />
+                  <Input id="name" placeholder="Ej.: Canil principal" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -101,7 +101,7 @@ export const LocationForm = ({ onFormSubmit, location }: Props) => {
                 >
                   <FormControl>
                     <SelectTrigger className="w-full" id="type">
-                      <SelectValue placeholder="Select a location type" />
+                      <SelectValue placeholder="Selecciona un tipo de ubicación" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -121,7 +121,7 @@ export const LocationForm = ({ onFormSubmit, location }: Props) => {
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button" variant="outline" disabled={isPending}>
-              Cancel
+              Cancelar
             </Button>
           </DialogClose>
           <Button type="submit" disabled={isPending}>
@@ -131,9 +131,9 @@ export const LocationForm = ({ onFormSubmit, location }: Props) => {
                 {location ? "Updating..." : "Creating..."}
               </>
             ) : location ? (
-              "Update Location"
+              "Actualizar ubicación"
             ) : (
-              "Create Location"
+              "Crear ubicación"
             )}
           </Button>
         </DialogFooter>

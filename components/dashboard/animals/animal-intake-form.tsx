@@ -298,10 +298,10 @@ const AnimalForm = ({
                   name="animalName"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel required>Animal Name</FormLabel>
+                      <FormLabel required>Nombre del animal</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="e.g., Buddy"
+                          placeholder="Ej.: Toby"
                           {...field}
                           autoComplete="off"
                         />
@@ -327,7 +327,7 @@ const AnimalForm = ({
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select a species" />
+                            <SelectValue placeholder="Selecciona una especie" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -356,7 +356,7 @@ const AnimalForm = ({
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select a breed" />
+                            <SelectValue placeholder="Selecciona una raza" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -384,7 +384,7 @@ const AnimalForm = ({
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select a color" />
+                            <SelectValue placeholder="Selecciona un color" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -435,9 +435,9 @@ const AnimalForm = ({
                           </PopoverTrigger>
                           <PopoverContent className="w-(--radix-popover-trigger-width) p-0">
                             <Command>
-                              <CommandInput placeholder="Search colors..." />
+                              <CommandInput placeholder="Buscar colores..." />
                               <CommandList>
-                                <CommandEmpty>No color found.</CommandEmpty>
+                                <CommandEmpty>No se encontró el color.</CommandEmpty>
                                 <CommandGroup>
                                   {available.map((c) => {
                                     const checked = selectedIds.includes(c.id);
@@ -506,7 +506,7 @@ const AnimalForm = ({
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select sex" />
+                            <SelectValue placeholder="Selecciona el sexo" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -559,7 +559,7 @@ const AnimalForm = ({
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Not specified" />
+                            <SelectValue placeholder="No especificado" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -587,7 +587,7 @@ const AnimalForm = ({
                   name="healthStatus"
                   render={({ field }) => (
                     <FormItem className="col-span-2">
-                      <FormLabel required>Health Status</FormLabel>
+                        <FormLabel required>Estado de salud</FormLabel>
                       <Select
                         name={field.name}
                         onValueChange={field.onChange}
@@ -595,7 +595,7 @@ const AnimalForm = ({
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select health status" />
+                            <SelectValue placeholder="Selecciona el estado de salud" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -702,7 +702,7 @@ const AnimalForm = ({
                   render={({ field }) => (
                     <FormItem className="col-span-2">
                       <div className="flex items-center gap-1.5">
-                        <FormLabel required>Listing Status</FormLabel>
+                        <FormLabel required>Estado de publicación</FormLabel>
                         {isStatusLocked && (
                           <FieldInfo
                             label="Why the listing status is locked"
@@ -722,7 +722,7 @@ const AnimalForm = ({
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select listing status" />
+                            <SelectValue placeholder="Selecciona el estado de publicación" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -747,7 +747,7 @@ const AnimalForm = ({
                 
                 <FormItem className="col-span-3">
                   <div className="flex items-center gap-1.5">
-                    <Label htmlFor="animal-location">Location</Label>
+                    <Label htmlFor="animal-location">Ubicación</Label>
                     <FieldInfo label="About location">
                       Where the animal is physically housed. Leave as Unplaced
                       if unknown.
@@ -771,7 +771,7 @@ const AnimalForm = ({
                       className="w-full"
                       aria-describedby="location-hint"
                     >
-                      <SelectValue placeholder="Select a location" />
+                      <SelectValue placeholder="Selecciona una ubicación" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value={UNPLACED_VALUE}>Unplaced</SelectItem>
@@ -802,7 +802,7 @@ const AnimalForm = ({
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select a unit" />
+                      <SelectValue placeholder="Selecciona una unidad" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -825,7 +825,7 @@ const AnimalForm = ({
                       <FormLabel>Description</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Tell us about this animal's personality, quirks, and what makes them special! Help potential adopters imagine them in a loving home."
+                          placeholder="Cuéntanos sobre la personalidad, particularidades y cualidades de este animal. Ayuda a los posibles adoptantes a imaginarlo en un hogar lleno de cariño."
                           {...field}
                         />
                       </FormControl>
@@ -854,7 +854,7 @@ const AnimalForm = ({
               type="button"
               disabled={isPending}
             >
-              <Link href={`/dashboard/animals`}>Cancel</Link>
+              <Link href={`/dashboard/animals`}>Cancelar</Link>
             </Button>
             <Button type="submit" size="lg" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

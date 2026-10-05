@@ -80,14 +80,14 @@ export function AssessmentActions({
         {isDeleted ? (
           <DropdownMenuItem onClick={onRestore} disabled={isPending}>
             <Undo2 className="mr-2 h-4 w-4" />
-            <span>Restore</span>
+                <span>Restaurar</span>
           </DropdownMenuItem>
         ) : (
           <>
             <DropdownMenuItem asChild>
               <Link href={editHref(animalId, assessmentId)}>
                 <Edit className="mr-2 h-4 w-4" />
-                <span>Edit</span>
+                <span>Editar</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -96,7 +96,7 @@ export function AssessmentActions({
               className="text-destructive focus:text-destructive focus:bg-destructive/10"
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              <span>Delete</span>
+                <span>Eliminar</span>
             </DropdownMenuItem>
           </>
         )}

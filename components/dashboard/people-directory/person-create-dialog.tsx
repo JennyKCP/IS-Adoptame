@@ -182,11 +182,11 @@ export function PersonCreateDialog({
                 disabled={isPending}
                 onClick={() => handleOpenChange(false)}
               >
-                Cancel
+                Cancelar
               </Button>
               <Button type="submit" disabled={isPending}>
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isPending ? "Creating..." : "Create Person"}
+                {isPending ? "Creando..." : "Crear persona"}
               </Button>
             </DialogFooter>
           </form>

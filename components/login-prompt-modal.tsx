@@ -71,7 +71,7 @@ const LoginPromptModal = ({
 
           <DialogFooter className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
             <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
+              <Button variant="outline">Cancelar</Button>
             </DialogClose>
 
             <Button asChild onClick={onClose}>

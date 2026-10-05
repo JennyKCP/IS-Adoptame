@@ -176,7 +176,7 @@ export function PlacementCreateForm({
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select an active foster with capacity" />
+                          <SelectValue placeholder="Selecciona un cuidador activo con capacidad" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -212,7 +212,7 @@ export function PlacementCreateForm({
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a placement type" />
+                          <SelectValue placeholder="Selecciona un tipo de colocación" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -274,7 +274,7 @@ export function PlacementCreateForm({
               type="button"
               disabled={isPending}
             >
-              <Link href={cancelHref}>Cancel</Link>
+              <Link href={cancelHref}>Cancelar</Link>
             </Button>
             <Button type="submit" size="lg" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

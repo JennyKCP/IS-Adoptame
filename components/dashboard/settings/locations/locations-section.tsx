@@ -86,11 +86,11 @@ function LocationActions({ location }: { location: LocationWithUnits }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DialogTrigger asChild>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>Editar</DropdownMenuItem>
           </DialogTrigger>
           {location.deletedAt ? (
             <DropdownMenuItem onClick={onRestore} disabled={isPending}>
-              Restore
+              Restaurar
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem
@@ -98,7 +98,7 @@ function LocationActions({ location }: { location: LocationWithUnits }) {
               onClick={onSoftDelete}
               disabled={isPending}
             >
-              Delete
+              Eliminar
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
@@ -106,9 +106,9 @@ function LocationActions({ location }: { location: LocationWithUnits }) {
 
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle>Edit Location</DialogTitle>
+          <DialogTitle>Editar ubicación</DialogTitle>
           <DialogDescription>
-            Update the name or type for this location. Click update when
+            Actualiza el nombre o tipo de esta ubicación. Haz clic en actualizar cuando
             you&apos;re done.
           </DialogDescription>
         </DialogHeader>
@@ -161,11 +161,11 @@ function UnitActions({ unit, locationId }: { unit: UnitModel; locationId: string
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DialogTrigger asChild>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>Editar</DropdownMenuItem>
           </DialogTrigger>
           {unit.deletedAt ? (
             <DropdownMenuItem onClick={onRestore} disabled={isPending}>
-              Restore
+              Restaurar
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem
@@ -173,7 +173,7 @@ function UnitActions({ unit, locationId }: { unit: UnitModel; locationId: string
               onClick={onSoftDelete}
               disabled={isPending}
             >
-              Delete
+              Eliminar
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
@@ -181,9 +181,9 @@ function UnitActions({ unit, locationId }: { unit: UnitModel; locationId: string
 
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle>Edit Unit</DialogTitle>
+          <DialogTitle>Editar unidad</DialogTitle>
           <DialogDescription>
-            Update the name or capacity for this unit. Click update when
+            Actualiza el nombre o capacidad de esta unidad. Haz clic en actualizar cuando
             you&apos;re done.
           </DialogDescription>
         </DialogHeader>
@@ -232,7 +232,7 @@ function LocationBlock({ location }: { location: LocationWithUnits }) {
                 disabled={!!location.deletedAt}
                 title={
                   location.deletedAt
-                    ? "Restore this location before adding units."
+                    ? "Restaura esta ubicación antes de agregar unidades."
                     : undefined
                 }
               >
@@ -244,7 +244,7 @@ function LocationBlock({ location }: { location: LocationWithUnits }) {
               <DialogHeader>
                 <DialogTitle>Add Unit</DialogTitle>
                 <DialogDescription>
-                  Create a new unit under {location.name}. Click create when
+                  Crea una unidad nueva en {location.name}. Haz clic en crear cuando
                   you&apos;re done.
                 </DialogDescription>
               </DialogHeader>
@@ -322,14 +322,14 @@ export const LocationsSection = ({ locations }: Props) => {
             <DialogTrigger asChild>
               <Button size="sm">
                 <PlusCircle className="size-4 mr-2" />
-                Add Location
+                Agregar ubicación
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[480px]">
               <DialogHeader>
-                <DialogTitle>Add Location</DialogTitle>
+                <DialogTitle>Agregar ubicación</DialogTitle>
                 <DialogDescription>
-                  Create a new location. Click create when you&apos;re done.
+                  Crea una ubicación nueva. Haz clic en crear cuando termines.
                 </DialogDescription>
               </DialogHeader>
               <LocationForm onFormSubmit={() => setIsAddDialogOpen(false)} />
@@ -364,7 +364,7 @@ export const LocationsSection = ({ locations }: Props) => {
               onClick={() => setIsAddDialogOpen(true)}
             >
               <PlusCircle className="size-4 mr-2" />
-              Add Location
+              Agregar ubicación
             </Button>
           </div>
         )}

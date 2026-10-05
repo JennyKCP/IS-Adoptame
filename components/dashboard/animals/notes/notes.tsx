@@ -172,7 +172,7 @@ const AnimalNotes = ({ notes, totalPages, animalId, canManage }: Props) => {
             <div className="flex items-center gap-2">
               <ServerSideSort
                 paramKey="sort"
-                placeholder="Select order"
+                placeholder="Seleccionar orden"
                 options={[
                   { label: "Newest First", value: "createdAt.desc" },
                   { label: "Oldest First", value: "createdAt.asc" },

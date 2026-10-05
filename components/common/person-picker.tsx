@@ -200,7 +200,7 @@ export const PersonPicker = ({
             aria-expanded={open}
             className="w-full justify-between font-normal text-muted-foreground"
           >
-            Search for a person...
+            Buscar una persona...
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
@@ -210,7 +210,7 @@ export const PersonPicker = ({
         >
           <Command shouldFilter={false}>
             <CommandInput
-              placeholder="Type a name, email, or phone..."
+              placeholder="Escribe un nombre, correo o teléfono..."
               value={query}
               onValueChange={(newQuery) => {
                 setQuery(newQuery);

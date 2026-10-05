@@ -47,8 +47,8 @@ export function AssigneeCell({
   assigneeList,
   canManage,
   onAssigneeChange,
-  unassignedLabel = "Unassigned",
-  searchPlaceholder = "Search name...",
+  unassignedLabel = "Sin asignar",
+  searchPlaceholder = "Buscar nombre...",
   emptyLabel = "No one found.",
   successMessage = "Assignee updated successfully.",
 }: AssigneeCellProps) {

@@ -157,7 +157,7 @@ export function FosterApplicationReview({
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel required>Application Status</FormLabel>
+                      <FormLabel required>Estado de la solicitud</FormLabel>
                       <Select
                         name={field.name}
                         onValueChange={field.onChange}
@@ -166,7 +166,7 @@ export function FosterApplicationReview({
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a new status">
+                            <SelectValue placeholder="Selecciona un nuevo estado">
                               {FosterApplicationStatuses.find(
                                 (s) => s.value === field.value,
                               )?.label ?? field.value}
@@ -197,10 +197,10 @@ export function FosterApplicationReview({
                     name="statusChangeReason"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel required>Reason for Status Change</FormLabel>
+                        <FormLabel required>Motivo del cambio de estado</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Provide a reason for changing the status..."
+                            placeholder="Escribe el motivo del cambio de estado..."
                             className="resize-y"
                             disabled={isPending}
                             {...field}
@@ -244,7 +244,7 @@ export function FosterApplicationReview({
 
       <Card>
         <CardHeader>
-          <CardTitle>Foster Capabilities</CardTitle>
+          <CardTitle>Capacidades para acogida</CardTitle>
         </CardHeader>
         <CardContent>
           <CapabilityReadOnlyRows application={application} />
@@ -253,7 +253,7 @@ export function FosterApplicationReview({
 
       <Card>
         <CardHeader>
-          <CardTitle>Status History</CardTitle>
+          <CardTitle>Historial de estados</CardTitle>
         </CardHeader>
         <CardContent>
           <StatusHistoryTimeline history={application.history} />

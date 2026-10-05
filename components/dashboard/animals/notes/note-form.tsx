@@ -109,7 +109,7 @@ export const NoteForm = ({ animalId, onFormSubmit, ref, note }: Props) => {
                 >
                   <FormControl>
                     <SelectTrigger className="w-full" id="category">
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder="Selecciona una categoría" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -134,7 +134,7 @@ export const NoteForm = ({ animalId, onFormSubmit, ref, note }: Props) => {
                 <FormLabel required>Content</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Provide a detailed description of the note..."
+                    placeholder="Escribe una descripción detallada de la nota..."
                     {...field}
                   />
                 </FormControl>

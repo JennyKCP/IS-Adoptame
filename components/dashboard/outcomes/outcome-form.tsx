@@ -186,7 +186,7 @@ export function OutcomeForm({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a reason" />
+                          <SelectValue placeholder="Selecciona un motivo" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -240,7 +240,7 @@ export function OutcomeForm({
                     >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select a partner shelter or rescue" />
+                          <SelectValue placeholder="Selecciona un refugio o grupo de rescate" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -289,7 +289,7 @@ export function OutcomeForm({
                   <FormLabel>Notes</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Add any relevant notes about this outcome..."
+                      placeholder="Agrega notas relevantes sobre este resultado..."
                       className="resize-y"
                       {...field}
                     />
@@ -307,7 +307,7 @@ export function OutcomeForm({
               type="button"
               disabled={isPending}
             >
-              <Link href={`/dashboard/animals/${animal.id}`}>Cancel</Link>
+              <Link href={`/dashboard/animals/${animal.id}`}>Cancelar</Link>
             </Button>
             <Button type="submit" size="lg" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

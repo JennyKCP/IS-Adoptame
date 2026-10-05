@@ -107,13 +107,13 @@ export function VitalsActions({
           <DialogTrigger asChild>
             <DropdownMenuItem>
               <Edit className="mr-2 h-4 w-4" />
-              <span>Edit</span>
+              <span>Editar</span>
             </DropdownMenuItem>
           </DialogTrigger>
           {vitalsLog.deletedAt ? (
             <DropdownMenuItem onClick={onRestore} disabled={isPending}>
               <Undo2 className="mr-2 h-4 w-4" />
-              <span>Restore</span>
+              <span>Restaurar</span>
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem
@@ -122,7 +122,7 @@ export function VitalsActions({
               className="text-destructive focus:text-destructive focus:bg-destructive/10"
             >
               <Trash2 className="mr-2 h-4 w-4" />
-              <span>Delete</span>
+              <span>Eliminar</span>
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>

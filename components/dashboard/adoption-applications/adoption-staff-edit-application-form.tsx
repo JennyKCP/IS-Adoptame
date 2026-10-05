@@ -154,7 +154,7 @@ export function StaffApplicationUpdateForm({
         >
           <Card className="border-primary">
             <CardHeader>
-              <CardTitle>Staff Actions</CardTitle>
+              <CardTitle>Acciones del personal</CardTitle>
               <CardDescription className="flex items-center pt-1">
                 Reviewing application from
                 <span className="font-semibold mx-1">
@@ -174,7 +174,7 @@ export function StaffApplicationUpdateForm({
                     href={`/dashboard/adoption-applications/${application.id}/edit?returnTo=/dashboard/adoption-applications/${application.id}/review`}
                   >
                     <Pencil className="mr-2 h-3.5 w-3.5" />
-                    Edit Application Fields
+                Editar campos de la solicitud
                   </Link>
                 </Button>
               )}
@@ -212,7 +212,7 @@ export function StaffApplicationUpdateForm({
                       <Link
                         href={`/dashboard/outcomes/create?applicationId=${application.id}`}
                       >
-                        Create Outcome
+                        Crear resultado
                       </Link>
                     </Button>
                   </AlertDescription>
@@ -225,7 +225,7 @@ export function StaffApplicationUpdateForm({
                   name="status"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Application Status</FormLabel>
+                      <FormLabel>Estado de la solicitud</FormLabel>
                       <Select
                         name={field.name}
                         onValueChange={field.onChange}
@@ -236,7 +236,7 @@ export function StaffApplicationUpdateForm({
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select a new status">
+                            <SelectValue placeholder="Selecciona un nuevo estado">
                               {formatSingleEnumOption(
                                 field.value ?? currentStatus,
                               )}
@@ -267,7 +267,7 @@ export function StaffApplicationUpdateForm({
                         </FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Provide a reason for changing the status..."
+                            placeholder="Escribe el motivo del cambio de estado..."
                             className="resize-y"
                             disabled={isPending || isAdopted}
                             {...field}
@@ -289,10 +289,10 @@ export function StaffApplicationUpdateForm({
                   name="internalNotes"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Internal Notes</FormLabel>
+                      <FormLabel>Notas internas</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Add or update internal notes for staff view only."
+                          placeholder="Agrega o actualiza notas internas visibles solo para el personal."
                           className="resize-y min-h-25"
                           disabled={isPending || isAdopted}
                           {...field}
@@ -325,7 +325,7 @@ export function StaffApplicationUpdateForm({
               {lastEditedAt && (
                 <Alert>
                   <PencilLine className="h-4 w-4" />
-                  <AlertTitle>Edited after submission</AlertTitle>
+                  <AlertTitle>Editada después del envío</AlertTitle>
                   <AlertDescription>
                     These answers were last changed
                     {application.lastEditedBy
@@ -339,7 +339,7 @@ export function StaffApplicationUpdateForm({
               )}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                <FormLabel>Nombre completo</FormLabel>
                   <FormControl>
                     <Input
                       value={application.applicantName}
@@ -359,7 +359,7 @@ export function StaffApplicationUpdateForm({
                   </FormControl>
                 </FormItem>
                 <FormItem>
-                  <FormLabel>Phone</FormLabel>
+                <FormLabel>Teléfono</FormLabel>
                   <FormControl>
                     <Input
                       value={application.applicantPhone}
@@ -372,7 +372,7 @@ export function StaffApplicationUpdateForm({
               <Separator />
               <div className="space-y-6">
                 <FormItem>
-                  <FormLabel>Address Line 1</FormLabel>
+                <FormLabel>Línea de dirección 1</FormLabel>
                   <FormControl>
                     <Input
                       value={application.applicantAddressLine1}
@@ -382,7 +382,7 @@ export function StaffApplicationUpdateForm({
                   </FormControl>
                 </FormItem>
                 <FormItem>
-                  <FormLabel>Address Line 2</FormLabel>
+                <FormLabel>Línea de dirección 2</FormLabel>
                   <FormControl>
                     <Input
                       value={application.applicantAddressLine2 ?? ""}
@@ -393,7 +393,7 @@ export function StaffApplicationUpdateForm({
                 </FormItem>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <FormItem>
-                    <FormLabel>City</FormLabel>
+                    <FormLabel>Ciudad</FormLabel>
                     <FormControl>
                       <Input
                         value={application.applicantCity}
@@ -403,7 +403,7 @@ export function StaffApplicationUpdateForm({
                     </FormControl>
                   </FormItem>
                   <FormItem>
-                    <FormLabel>State</FormLabel>
+                    <FormLabel>Estado</FormLabel>
                     <Select
                     name="applicantState"
                     value={application.applicantState}
@@ -438,7 +438,7 @@ export function StaffApplicationUpdateForm({
 
           <Card>
             <CardHeader>
-              <CardTitle>Home & Lifestyle (Read-Only)</CardTitle>
+              <CardTitle>Hogar y estilo de vida (solo lectura)</CardTitle>
             </CardHeader>
             <CardContent className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -462,7 +462,7 @@ export function StaffApplicationUpdateForm({
                   </Select>
                 </FormItem>
                 <FormItem>
-                  <FormLabel>Household Size</FormLabel>
+                  <FormLabel>Tamaño del hogar</FormLabel>
                   <FormControl>
                     <Input
                       value={application.householdSize}
@@ -554,7 +554,7 @@ export function StaffApplicationUpdateForm({
               </div>
               <Separator />
               <FormItem>
-                <FormLabel>Other Animals in the Home</FormLabel>
+                <FormLabel>Otros animales en el hogar</FormLabel>
                 <FormControl>
                   <Textarea
                     value={application.otherAnimalsDescription ?? "N/A"}
@@ -573,7 +573,7 @@ export function StaffApplicationUpdateForm({
             </CardHeader>
             <CardContent className="space-y-8">
               <FormItem>
-                <FormLabel>Animal Experience</FormLabel>
+                <FormLabel>Experiencia con animales</FormLabel>
                 <FormControl>
                   <Textarea
                     value={application.animalExperience ?? "N/A"}
@@ -584,7 +584,7 @@ export function StaffApplicationUpdateForm({
                 </FormControl>
               </FormItem>
               <FormItem>
-                <FormLabel>Reason for Adoption</FormLabel>
+                <FormLabel>Motivo de la adopción</FormLabel>
                 <FormControl>
                   <Textarea
                     value={application.reasonForAdoption}
@@ -599,7 +599,7 @@ export function StaffApplicationUpdateForm({
 
           <Card>
             <CardHeader>
-              <CardTitle>Status History</CardTitle>
+              <CardTitle>Historial de estados</CardTitle>
             </CardHeader>
             <CardContent>
               <StatusHistoryTimeline history={application.history} />
@@ -614,12 +614,12 @@ export function StaffApplicationUpdateForm({
               disabled={isPending}
             >
               <Link href={returnTo ?? "/dashboard/adoption-applications"}>
-                Cancel
+                Cancelar
               </Link>
             </Button>
             <Button type="submit" disabled={isPending || isAdopted}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isPending ? "Updating..." : "Update Application"}
+              {isPending ? "Actualizando..." : "Actualizar solicitud"}
             </Button>
           </div>
         </form>

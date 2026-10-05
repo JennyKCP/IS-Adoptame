@@ -115,7 +115,7 @@ export function DataTableRowActions({
             disabled={isPending}
           >
             <MoreHorizontal className="h-4 w-4" />
-            <span className="sr-only">Open menu</span>
+            <span className="sr-only">Abrir menú</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40">
@@ -128,7 +128,7 @@ export function DataTableRowActions({
           )}
           {showEdit && (
             <Link href={`/dashboard/outcomes/${outcome.id}/edit`}>
-              <DropdownMenuItem>Edit</DropdownMenuItem>
+              <DropdownMenuItem>Editar</DropdownMenuItem>
             </Link>
           )}
           {showEdit && showReverse && <DropdownMenuSeparator />}
@@ -183,7 +183,7 @@ export function DataTableRowActions({
           )}
         </div>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>Cancelar</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();

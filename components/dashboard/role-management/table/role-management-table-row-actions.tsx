@@ -95,12 +95,12 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
             className="flex h-8 w-8 p-0"
             disabled={isPending}
           >
-            <span className="sr-only">Open menu</span>
+            <span className="sr-only">Abrir menú</span>
             <MoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuLabel>Acciones</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {assignableRoles.map((role) => (
             <DropdownMenuItem
@@ -166,7 +166,7 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
           disabled={isPending}
         />
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>Cancelar</AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault();

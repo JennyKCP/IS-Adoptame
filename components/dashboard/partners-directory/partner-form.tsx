@@ -267,7 +267,7 @@ const PartnerForm = ({ partner, cancelHref, returnTo }: PartnerFormProps) => {
                       >
                         <FormControl>
                           <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select a state" />
+                            <SelectValue placeholder="Selecciona un estado" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>

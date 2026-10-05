@@ -98,7 +98,7 @@ export function ContactActions({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DialogTrigger asChild>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>Editar</DropdownMenuItem>
           </DialogTrigger>
 
           {!contact.isPrimary && contact.isActive && (

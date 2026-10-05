@@ -217,7 +217,7 @@ export function AssessmentForm({
               >
                 <FormControl>
                   <SelectTrigger id="template-picker" className="w-full">
-                    <SelectValue placeholder="Select a template" />
+                    <SelectValue placeholder="Selecciona una plantilla" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -307,7 +307,7 @@ export function AssessmentForm({
                 >
                   <FormControl>
                     <SelectTrigger id="signal" className="w-full">
-                      <SelectValue placeholder="Select a signal" />
+                    <SelectValue placeholder="Selecciona una señal" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -488,7 +488,7 @@ function AnswerInput({ field, name, rhf }: AnswerInputProps) {
           name={rhf.name}
         >
           <SelectTrigger id={name} className="w-full">
-            <SelectValue placeholder="Select…" />
+            <SelectValue placeholder="Selecciona…" />
           </SelectTrigger>
           <SelectContent>
             {(field.options ?? []).map((option) => (

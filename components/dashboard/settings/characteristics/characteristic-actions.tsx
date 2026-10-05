@@ -77,11 +77,11 @@ export function CharacteristicActions({ characteristic }: Props) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DialogTrigger asChild>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>Editar</DropdownMenuItem>
           </DialogTrigger>
           {characteristic.deletedAt ? (
             <DropdownMenuItem onClick={onRestore} disabled={isPending}>
-              Restore
+              Restaurar
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem
@@ -89,7 +89,7 @@ export function CharacteristicActions({ characteristic }: Props) {
               onClick={onSoftDelete}
               disabled={isPending}
             >
-              Delete
+              Eliminar
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
@@ -97,9 +97,9 @@ export function CharacteristicActions({ characteristic }: Props) {
 
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle>Edit Characteristic</DialogTitle>
+          <DialogTitle>Editar característica</DialogTitle>
           <DialogDescription>
-            Update the name or category for this characteristic. Click update
+            Actualiza el nombre o categoría de esta característica. Haz clic en actualizar
             when you&apos;re done.
           </DialogDescription>
         </DialogHeader>

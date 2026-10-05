@@ -146,7 +146,7 @@ const AnimalVitalsTab = ({
           />
           <ServerSideSort
             paramKey="sort"
-            placeholder="Select order"
+            placeholder="Seleccionar orden"
             options={[
               { label: "Newest First", value: "recordedAt.desc" },
               { label: "Oldest First", value: "recordedAt.asc" },

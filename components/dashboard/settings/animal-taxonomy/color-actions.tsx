@@ -72,11 +72,11 @@ export function ColorActions({ color }: Props) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DialogTrigger asChild>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
+            <DropdownMenuItem>Editar</DropdownMenuItem>
           </DialogTrigger>
           {color.deletedAt ? (
             <DropdownMenuItem onClick={onRestore} disabled={isPending}>
-              Restore
+              Restaurar
             </DropdownMenuItem>
           ) : (
             <DropdownMenuItem
@@ -84,7 +84,7 @@ export function ColorActions({ color }: Props) {
               onClick={onSoftDelete}
               disabled={isPending}
             >
-              Delete
+              Eliminar
             </DropdownMenuItem>
           )}
         </DropdownMenuContent>
@@ -92,9 +92,9 @@ export function ColorActions({ color }: Props) {
 
       <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
-          <DialogTitle>Edit Color</DialogTitle>
+          <DialogTitle>Editar color</DialogTitle>
           <DialogDescription>
-            Update the name for this color. Click update when you&apos;re done.
+            Actualiza el nombre de este color. Haz clic en actualizar cuando termines.
           </DialogDescription>
         </DialogHeader>
         <ColorForm onFormSubmit={() => setIsDialogOpen(false)} color={color} />

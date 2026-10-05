@@ -83,7 +83,7 @@ export const PartnerContactPicker = ({
         align="start"
       >
         <Command>
-          <CommandInput placeholder="Type a name or email..." />
+          <CommandInput placeholder="Escribe un nombre o correo..." />
           <CommandList>
             <CommandEmpty>No people found.</CommandEmpty>
             <CommandGroup>

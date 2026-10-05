@@ -57,7 +57,7 @@ export const IntakeFormFields = <T extends FieldValues & IntakeFieldsValues>({
 
   return (
     <div className="space-y-6">
-      <h3 className="font-semibold border-b pb-2">Intake & Source Details</h3>
+      <h3 className="font-semibold border-b pb-2">Detalles del ingreso y origen</h3>
 
       <div className="grid grid-cols-1 @[662px]:grid-cols-6 gap-x-4 gap-y-8">
         <FormField
@@ -65,7 +65,7 @@ export const IntakeFormFields = <T extends FieldValues & IntakeFieldsValues>({
           name={"intakeType" as Path<T>}
           render={({ field }) => (
             <FormItem className="col-span-3">
-              <FormLabel required>Intake Type</FormLabel>
+              <FormLabel required>Tipo de ingreso</FormLabel>
               <Select
                 name={field.name}
                 onValueChange={field.onChange}
@@ -73,7 +73,7 @@ export const IntakeFormFields = <T extends FieldValues & IntakeFieldsValues>({
               >
                 <FormControl>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a type" />
+                    <SelectValue placeholder="Selecciona un tipo" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -109,10 +109,10 @@ export const IntakeFormFields = <T extends FieldValues & IntakeFieldsValues>({
           name={"notes" as Path<T>}
           render={({ field }) => (
             <FormItem className="col-span-full">
-              <FormLabel>Internal Notes</FormLabel>
+              <FormLabel>Notas internas</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Any notes about the intake event..."
+                  placeholder="Cualquier nota sobre el evento de ingreso..."
                   {...field}
                 />
               </FormControl>
@@ -132,13 +132,13 @@ export const IntakeFormFields = <T extends FieldValues & IntakeFieldsValues>({
 
         {intakeType === IntakeType.TRANSFER_IN && (
           <div className="grid grid-cols-1 @[662px]:grid-cols-6 gap-x-4 gap-y-8 p-4 border rounded-md">
-            <h4 className="font-semibold col-span-full">Transfer Details</h4>
+            <h4 className="font-semibold col-span-full">Detalles de la transferencia</h4>
             <FormField
               control={control}
               name={"sourcePartnerId" as Path<T>}
               render={({ field }) => (
                 <FormItem className="col-span-full">
-                  <FormLabel required>Source Partner</FormLabel>
+                  <FormLabel required>Socio de origen</FormLabel>
                   <Select
                     name={field.name}
                     onValueChange={field.onChange}
@@ -146,7 +146,7 @@ export const IntakeFormFields = <T extends FieldValues & IntakeFieldsValues>({
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a partner shelter/rescue" />
+                        <SelectValue placeholder="Selecciona un refugio o grupo de rescate" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -166,7 +166,7 @@ export const IntakeFormFields = <T extends FieldValues & IntakeFieldsValues>({
 
         {intakeType === IntakeType.STRAY && (
           <div className="grid grid-cols-1 @[662px]:grid-cols-6 gap-x-4 gap-y-8 p-4 border rounded-md">
-            <h4 className="font-semibold col-span-full">Location Found</h4>
+            <h4 className="font-semibold col-span-full">Lugar donde fue encontrado</h4>
             <FormField
               control={control}
               name={"foundCity" as Path<T>}
@@ -174,7 +174,7 @@ export const IntakeFormFields = <T extends FieldValues & IntakeFieldsValues>({
                 <FormItem className="col-span-3">
                   <FormLabel required>City</FormLabel>
                   <FormControl>
-                    <Input placeholder="Anytown" {...field} />
+                    <Input placeholder="Ciudad" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -194,7 +194,7 @@ export const IntakeFormFields = <T extends FieldValues & IntakeFieldsValues>({
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a state" />
+                        <SelectValue placeholder="Selecciona un estado" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -217,7 +217,7 @@ export const IntakeFormFields = <T extends FieldValues & IntakeFieldsValues>({
                   <FormLabel required>Address / Cross Streets</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="e.g., Corner of Main St & Park Ave"
+                      placeholder="Ej.: esquina de la calle Principal y avenida Parque"
                       {...field}
                     />
                   </FormControl>
@@ -241,7 +241,7 @@ export const IntakeFormFields = <T extends FieldValues & IntakeFieldsValues>({
             name={"surrenderingPersonId" as Path<T>}
             render={({ field }) => (
               <FormItem className="col-span-full">
-                <FormLabel required>Surrendering Person</FormLabel>
+                <FormLabel required>Persona que entrega al animal</FormLabel>
                 <FormControl>
                   <PersonPicker
                     value={field.value || null}

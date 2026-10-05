@@ -221,7 +221,7 @@ const StaffAdoptionApplicationForm = ({
                         >
                           <Command shouldFilter={false}>
                             <CommandInput
-                              placeholder="Type an animal name..."
+                              placeholder="Escribe el nombre de un animal..."
                               value={animalQuery}
                               onValueChange={(value) => {
                                 setAnimalQuery(value);

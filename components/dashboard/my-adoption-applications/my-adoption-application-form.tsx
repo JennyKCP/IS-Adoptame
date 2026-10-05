@@ -373,7 +373,7 @@ export function MyApplicationForm({
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder="Select a state" />
+                              <SelectValue placeholder="Selecciona un estado" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent className={selectContentClassName}>
@@ -426,7 +426,7 @@ export function MyApplicationForm({
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select your living situation" />
+                            <SelectValue placeholder="Selecciona tu situación de vivienda" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className={selectContentClassName}>

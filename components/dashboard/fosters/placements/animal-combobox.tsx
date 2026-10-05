@@ -117,7 +117,7 @@ export function AnimalCombobox({
         align="start"
       >
         <Command>
-          <CommandInput placeholder="Search animals…" />
+          <CommandInput placeholder="Buscar animales…" />
           <CommandList>
             <CommandEmpty>No in-care animals match.</CommandEmpty>
             <CommandGroup>

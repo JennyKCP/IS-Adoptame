@@ -27,7 +27,7 @@ const IntakeTableToolbar = ({ table }: IntakeTableToolbarProps) => {
           />
           <ServerSideSort
             paramKey="sort"
-            placeholder="Select order"
+              placeholder="Seleccionar orden"
             options={[
               { label: "Newest First", value: "date.desc" },
               { label: "Oldest First", value: "date.asc" },

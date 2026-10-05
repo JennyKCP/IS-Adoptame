@@ -28,16 +28,16 @@ export function AnimalTableRowActions({ row }: DataTableRowActionsProps) {
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
         >
           <MoreHorizontal />
-          <span className="sr-only">Open menu</span>
+          <span className="sr-only">Abrir menú</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-40">
         <Link href={`/dashboard/animals/${animal.id}`}>
-          <DropdownMenuItem>Profile</DropdownMenuItem>
+          <DropdownMenuItem>Perfil</DropdownMenuItem>
         </Link>
         <DropdownMenuSeparator />
         <Link href={`/dashboard/animals/${animal.id}/edit`}>
-          <DropdownMenuItem>Edit</DropdownMenuItem>
+          <DropdownMenuItem>Editar</DropdownMenuItem>
         </Link>
       </DropdownMenuContent>
     </DropdownMenu>

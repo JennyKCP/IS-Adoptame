@@ -76,7 +76,7 @@ export const StaffHouseholdForm = ({
           </CardContent>
           <CardFooter className="flex justify-end space-x-4">
             <Button asChild variant="outline" type="button" disabled={isPending}>
-              <Link href={`/dashboard/people-directory/${personId}`}>Cancel</Link>
+              <Link href={`/dashboard/people-directory/${personId}`}>Cancelar</Link>
             </Button>
             <Button type="submit" size="lg" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

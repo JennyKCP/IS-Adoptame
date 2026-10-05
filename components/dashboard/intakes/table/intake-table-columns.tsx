@@ -20,7 +20,7 @@ const describeSource = (
   switch (intake.type) {
     case IntakeType.TRANSFER_IN:
       return intake.sourcePartner
-        ? { name: intake.sourcePartner.name, label: "Partner" }
+        ? { name: intake.sourcePartner.name, label: "Socio" }
         : null;
     case IntakeType.OWNER_SURRENDER:
       return intake.surrenderingPerson
@@ -53,7 +53,7 @@ export const getColumns = ({
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
+        aria-label="Seleccionar todo"
         className="translate-y-0.5"
       />
     ),
@@ -61,7 +61,7 @@ export const getColumns = ({
       <Checkbox
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
+        aria-label="Seleccionar fila"
         className="translate-y-0.5"
       />
     ),

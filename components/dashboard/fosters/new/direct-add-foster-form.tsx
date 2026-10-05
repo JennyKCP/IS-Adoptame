@@ -146,7 +146,7 @@ export function DirectAddFosterForm({
               type="button"
               disabled={isPending}
             >
-              <Link href={returnTo || "/dashboard/fosters"}>Cancel</Link>
+              <Link href={returnTo || "/dashboard/fosters"}>Cancelar</Link>
             </Button>
             <Button type="submit" size="lg" disabled={isPending}>
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

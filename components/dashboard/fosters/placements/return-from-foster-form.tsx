@@ -132,7 +132,7 @@ export function ReturnFromFosterForm({
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select a reason" />
+                        <SelectValue placeholder="Selecciona un motivo" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -166,7 +166,7 @@ export function ReturnFromFosterForm({
                   }}
                 >
                   <SelectTrigger id="return-location" className="w-full">
-                    <SelectValue placeholder="Select a location" />
+                    <SelectValue placeholder="Selecciona una ubicación" />
                   </SelectTrigger>
                   <SelectContent>
                     {unitOptions.map((location) => (
@@ -191,7 +191,7 @@ export function ReturnFromFosterForm({
                     >
                       <FormControl>
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select a unit" />
+                    <SelectValue placeholder="Selecciona una unidad" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>

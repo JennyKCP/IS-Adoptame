@@ -92,7 +92,7 @@ export const BreedForm = ({ onFormSubmit, species, breed }: Props) => {
                 >
                   <FormControl>
                     <SelectTrigger className="w-full" id="speciesId">
-                      <SelectValue placeholder="Select a species" />
+                      <SelectValue placeholder="Selecciona una especie" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>

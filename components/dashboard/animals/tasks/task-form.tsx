@@ -167,7 +167,7 @@ export const TaskForm = ({
                 <FormLabel>Details</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Provide a detailed description of the task..."
+                  placeholder="Escribe una descripción detallada de la tarea..."
                     {...field}
                   />
                 </FormControl>
@@ -190,7 +190,7 @@ export const TaskForm = ({
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a category" />
+                      <SelectValue placeholder="Selecciona una categoría" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -220,7 +220,7 @@ export const TaskForm = ({
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a status" />
+                      <SelectValue placeholder="Selecciona un estado" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -250,7 +250,7 @@ export const TaskForm = ({
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select priority" />
+                      <SelectValue placeholder="Selecciona la prioridad" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -295,7 +295,7 @@ export const TaskForm = ({
                 >
                   <FormControl>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Select a staff member or volunteer" />
+                      <SelectValue placeholder="Selecciona un miembro del personal o voluntario" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
